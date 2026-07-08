@@ -295,4 +295,4 @@ Potential future improvements:
 
 ## License
 
-No license has been specified yet. Add a license before distributing or publishing publicly.
+This project is licensed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
