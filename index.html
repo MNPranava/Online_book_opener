@@ -1,12 +1,2694 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Online Book Opener</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foxed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+  :root{
+    --ink-shell: #14171A;
+    --wood: #2A2119;
+    --wood-light: #3A2E22;
+    --paper: #FBF8F2;
+    --paper-shadow: #EFE9DC;
+    --text: #221E18;
+    --text-soft: #6B6355;
+    --brass: #B4894F;
+    --brass-deep: #8C6A3C;
+    --line: rgba(255,255,255,0.09);
+    --line-paper: rgba(34,30,24,0.1);
+    --danger: #A6503F;
+    --radius: 10px;
+    --reader-font-size: 18px;
+    --reader-line-height: 1.85;
+    --reader-pad-y: 30px;
+    --reader-pad-x: 34px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+  *{ box-sizing: border-box; }
+  html,body{ min-height:100%; }
+  body{
+    margin:0;
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--paper);
+    color: var(--text);
+    display:flex;
+    height:100vh;
+    height:100dvh;
+    max-width:100vw;
+    overflow:hidden;
+  }
+  ::selection{ background: rgba(180,137,79,0.35); }
+  body.theme-sepia{
+    --paper:#F2E4C8;
+    --paper-shadow:#E5D2AA;
+    --text:#2B2117;
+    --text-soft:#6F5B3C;
+    --line-paper:rgba(43,33,23,0.14);
+    --brass:#A97838;
+    --brass-deep:#785225;
+    background:#F2E4C8;
+  }
+  body.theme-warm{
+    --paper:#FFF4E6;
+    --paper-shadow:#F0DEC5;
+    --text:#2D2118;
+    --text-soft:#745D48;
+    --line-paper:rgba(45,33,24,0.13);
+    --brass:#B77D4A;
+    --brass-deep:#855331;
+    background:#FFF4E6;
+  }
+  body.theme-dark{
+    --paper:#171512;
+    --paper-shadow:#24201A;
+    --text:#EAE2D6;
+    --text-soft:#B4A995;
+    --line-paper:rgba(234,226,214,0.14);
+    --danger:#D97766;
+    background:#171512;
+  }
+  body.theme-black{
+    --paper:#050505;
+    --paper-shadow:#111111;
+    --text:#F2F2F2;
+    --text-soft:#BDBDBD;
+    --line-paper:rgba(255,255,255,0.18);
+    --brass:#D0A96C;
+    --brass-deep:#C28D43;
+    --danger:#FF8B78;
+    background:#050505;
+  }
+  body.theme-contrast{
+    --paper:#FFFFFF;
+    --paper-shadow:#E8E8E8;
+    --text:#000000;
+    --text-soft:#1F1F1F;
+    --line-paper:rgba(0,0,0,0.34);
+    --brass:#005FCC;
+    --brass-deep:#004B9E;
+    --danger:#B00020;
+    background:#FFFFFF;
+  }
+  body.theme-sepia .reader-body{ background:#D8C49A; }
+  body.theme-warm .reader-body{ background:#EAD7BE; }
+  body.theme-dark .reader-body{ background:#0F0E0C; }
+  body.theme-black .reader-body{ background:#000; }
+  body.theme-contrast .reader-body{ background:#DADADA; }
+  body.theme-sepia input[type="url"], body.theme-sepia .book-card, body.theme-sepia .mode-btn, body.theme-sepia .page-btn, body.theme-sepia .btn-secondary, body.theme-sepia .modal-card, body.theme-sepia .delete-popover, body.theme-sepia .settings-btn, body.theme-sepia .settings-stepper button,
+  body.theme-warm input[type="url"], body.theme-warm .book-card, body.theme-warm .mode-btn, body.theme-warm .page-btn, body.theme-warm .btn-secondary, body.theme-warm .modal-card, body.theme-warm .delete-popover, body.theme-warm .settings-btn, body.theme-warm .settings-stepper button,
+  body.theme-dark input[type="url"], body.theme-dark .book-card, body.theme-dark .mode-btn, body.theme-dark .page-btn, body.theme-dark .btn-secondary, body.theme-dark .modal-card, body.theme-dark .delete-popover, body.theme-dark .settings-btn, body.theme-dark .settings-stepper button,
+  body.theme-black input[type="url"], body.theme-black .book-card, body.theme-black .mode-btn, body.theme-black .page-btn, body.theme-black .btn-secondary, body.theme-black .modal-card, body.theme-black .delete-popover, body.theme-black .settings-btn, body.theme-black .settings-stepper button,
+  body.theme-contrast input[type="url"], body.theme-contrast .book-card, body.theme-contrast .mode-btn, body.theme-contrast .page-btn, body.theme-contrast .btn-secondary, body.theme-contrast .modal-card, body.theme-contrast .delete-popover, body.theme-contrast .settings-btn, body.theme-contrast .settings-stepper button{ background:var(--paper); color:var(--text); }
+  body.theme-dark .pdf-page-canvas, body.theme-black .pdf-page-canvas{ box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  button{ font-family: inherit; }
+  a{ color: var(--brass-deep); }
+
+  /* ---------- Sidebar ---------- */
+  #sidebar{ width: 250px; flex-shrink:0; background: var(--ink-shell); color: #E8E2D6; display:flex; flex-direction:column; border-right: 1px solid var(--line); }
+  .brand{ padding: 20px 18px 14px; display:flex; align-items:baseline; gap:8px; border-bottom: 1px solid var(--line); }
+  .brand-mark{ font-family:'Fraunces', serif; font-weight:700; font-size:22px; color: var(--brass); }
+  .brand-tag{ font-family:'JetBrains Mono', monospace; font-size: 10px; color: #8A8578; text-transform: lowercase; }
+  .new-book-btn{ margin: 16px 18px 6px; padding: 11px 14px; background: transparent; border: 1px solid var(--brass-deep); color: var(--brass); border-radius: var(--radius); cursor:pointer; font-family:'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.03em; text-align:left; display:flex; align-items:center; gap:8px; transition: background 0.15s ease, color 0.15s ease; }
+  .new-book-btn:hover{ background: var(--brass); color: #17140F; }
+  .new-book-btn:focus-visible, button:focus-visible, input:focus-visible{ outline: 2px solid var(--brass); outline-offset: 2px; }
+  .shelf-label{ margin: 18px 18px 8px; font-family:'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #746E60; }
+  #shelf-wrap{ flex:1; overflow-y:auto; padding: 0 14px 16px; }
+  .shelf-row{ display:flex; align-items:flex-end; gap:5px; flex-wrap: wrap; padding: 10px 4px 16px; background: linear-gradient(to bottom, transparent 0%, transparent calc(100% - 8px), var(--wood) calc(100% - 8px), var(--wood-light) 100%); border-radius: 4px; margin-bottom: 4px; }
+  .spine{ position: relative; width: 30px; height: 138px; border-radius: 3px 3px 2px 2px; cursor: pointer; display:flex; align-items:flex-start; justify-content:center; padding-top: 10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 2px 3px 6px rgba(0,0,0,0.35); transition: transform 0.15s ease; flex-shrink:0; }
+  .spine:hover{ transform: translateY(-8px); }
+  .spine.active{ transform: translateY(-8px); box-shadow: inset 0 0 0 1px var(--brass), 2px 3px 6px rgba(0,0,0,0.45); }
+  .spine-title{ writing-mode: vertical-rl; transform: rotate(180deg); font-family:'Fraunces', serif; font-weight: 600; font-size: 11.5px; color: rgba(255,255,255,0.92); max-height: 108px; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .spine-progress{ position:absolute; left:3px; right:3px; bottom:6px; height:3px; background: rgba(255,255,255,0.18); border-radius:2px; overflow:hidden; }
+  .spine-progress > i{ display:block; height:100%; background: var(--brass); }
+  .spine.holding, .book-card.holding{ outline: 2px solid var(--brass); outline-offset: 3px; }
+  .spine::after{ content:'hold'; position:absolute; top:5px; left:50%; transform:translateX(-50%); font-family:'JetBrains Mono', monospace; font-size:7px; letter-spacing:0.08em; color:rgba(255,255,255,0.65); opacity:0; transition:opacity .15s ease; text-transform:uppercase; }
+  .spine:hover::after, .spine:focus-visible::after{ opacity:1; }
+  #shelf-empty{ color:#6B6559; font-size: 12.5px; padding: 6px 4px 16px; line-height:1.6; }
+  .sidebar-foot{ padding: 12px 18px 16px; font-family:'JetBrains Mono', monospace; font-size: 10px; color: #8A8578; border-top: 1px solid var(--line); }
+  .backup-actions{ display:flex; gap:6px; margin-top:9px; }
+  .backup-actions button{ flex:1; border:1px solid rgba(180,137,79,.45); background:transparent; color:var(--brass); border-radius:7px; padding:6px 4px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:9.5px; }
+  .backup-actions button:hover{ background:var(--brass); color:#17140F; }
+
+  /* ---------- Main / landing ---------- */
+  #main{ flex:1; min-width:0; overflow-y:auto; position:relative; background: var(--paper); }
+  .main-inner{ max-width: 760px; margin: 0 auto; padding: 64px 32px 80px; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-deep); margin: 0 0 10px; }
+  h1.page-title{ font-family:'Fraunces', serif; font-weight: 600; font-size: 40px; line-height: 1.15; margin: 0 0 14px; }
+  .lede{ color: var(--text-soft); font-size: 16px; line-height:1.6; margin: 0 0 40px; max-width: 52ch; }
+  .tabs{ display:flex; gap: 6px; margin-bottom: 22px; border-bottom: 1px solid var(--line-paper); }
+  .tab-btn{ background:none; border:none; cursor:pointer; padding: 10px 4px 12px; margin-right: 22px; font-family:'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.04em; color: var(--text-soft); border-bottom: 2px solid transparent; text-transform: uppercase; }
+  .tab-btn.active{ color: var(--text); border-bottom-color: var(--brass); }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  #dropzone{ border: 1.5px dashed var(--brass-deep); border-radius: var(--radius); padding: 46px 24px; text-align:center; cursor:pointer; background: var(--paper-shadow); transition: background 0.15s ease, border-color 0.15s ease; }
+  #dropzone:hover, #dropzone.drag{ background: #EAE2CF; border-color: var(--brass); }
+  #dropzone p{ margin:0; }
+  .drop-title{ font-family:'Fraunces', serif; font-size: 19px; font-weight:600; margin-bottom:6px; }
+  .drop-sub{ font-size: 13px; color: var(--text-soft); font-family:'JetBrains Mono', monospace; }
+  .link-row{ display:flex; gap:10px; }
+  input[type="url"]{ flex:1; padding: 13px 14px; border-radius: var(--radius); border: 1px solid var(--line-paper); background: #fff; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); }
+  .btn-primary{ padding: 13px 20px; border-radius: var(--radius); border: none; background: var(--brass-deep); color: #fff; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing:0.03em; text-transform: uppercase; }
+  .btn-primary:hover{ background: var(--brass); }
+  .btn-primary:disabled{ opacity:0.5; cursor:default; }
+  .hint{ margin-top:10px; font-size:12.5px; color: var(--text-soft); line-height:1.6; }
+  .error-banner{ margin-top: 16px; padding: 12px 14px; border-radius: 8px; background: #F4E3DF; color: var(--danger); font-size: 13px; line-height:1.5; display:none; }
+  .error-banner.show{ display:block; }
+  .error-banner.notice{ background:#EFE9DC; color:var(--brass-deep); }
+  .continue-section{ margin-top: 56px; }
+  .continue-heading{ font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 16px; }
+  .continue-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 14px; }
+  .book-card{ border: 1px solid var(--line-paper); border-radius: var(--radius); padding: 16px; cursor:pointer; background:#fff; display:flex; gap:12px; transition: box-shadow 0.15s ease, transform 0.15s ease; }
+  .book-card:hover{ box-shadow: 0 4px 14px rgba(34,30,24,0.08); transform: translateY(-2px); }
+  .book-card-spine{ width:10px; border-radius:2px; flex-shrink:0; }
+  .book-card-title{ font-family:'Fraunces', serif; font-weight:600; font-size:15.5px; margin:0 0 4px; line-height:1.3; }
+  .book-card-meta{ font-size:12px; color:var(--text-soft); font-family:'JetBrains Mono', monospace; }
+  .book-card-progress{ margin-top:8px; height:3px; background:var(--paper-shadow); border-radius:2px; overflow:hidden; }
+  .book-card-progress > i{ display:block; height:100%; background:var(--brass); }
+
+  /* ---------- Loading ---------- */
+  #loading-view{ display:flex; flex-direction:column; align-items:center; justify-content:center; height: 100%; gap: 18px; }
+  .spinner{ width:34px; height:34px; border-radius:50%; border: 3px solid var(--paper-shadow); border-top-color: var(--brass); animation: spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  #loading-msg{ font-family:'JetBrains Mono', monospace; font-size:13px; color: var(--text-soft); }
+
+  /* ---------- Reader shell ---------- */
+  #reader-view{ display:none; height:100%; flex-direction:column; }
+  .reader-topbar{ display:flex; align-items:center; justify-content:space-between; padding: 14px 28px; border-bottom: 1px solid var(--line-paper); flex-shrink:0; gap: 16px; }
+  .back-btn{ background:none; border:none; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--text-soft); display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .back-btn:hover{ color: var(--text); }
+  .reader-title-block{ text-align:center; overflow:hidden; flex:1; min-width:0; }
+  .reader-title{ font-family:'Fraunces', serif; font-weight:600; font-size:15px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .reader-author{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-soft); margin-top:2px; }
+  .topbar-right{ display:flex; align-items:center; gap:12px; flex-shrink:0; }
+  .mode-toggle{ display:flex; border: 1px solid var(--line-paper); border-radius: 8px; overflow:hidden; }
+  .page-zoom{ position:absolute; top:14px; display:flex; align-items:center; gap:2px; background: rgba(255,255,255,0.94); border:1px solid var(--line-paper); border-radius: 8px; padding: 3px; z-index:4; box-shadow: 0 2px 10px rgba(34,30,24,0.14); }
+  .page-zoom.corner-left{ left:14px; }
+  .page-zoom.corner-right{ right:14px; }
+  .page-zoom button{ background:none; border:none; cursor:pointer; width:22px; height:22px; border-radius:5px; font-family:'JetBrains Mono', monospace; font-size:13px; color: var(--text-soft); line-height:1; }
+  .page-zoom button:hover:not(:disabled){ background: var(--paper-shadow); color: var(--brass-deep); }
+  .page-zoom button:disabled{ opacity:0.32; cursor:default; }
+  .page-zoom .pz-level{ font-family:'JetBrains Mono', monospace; font-size:10px; color: var(--text-soft); padding: 0 3px; min-width:30px; text-align:center; }
+  .mode-btn{ background:#fff; border:none; cursor:pointer; padding: 7px 11px; font-family:'JetBrains Mono', monospace; font-size:11px; color: var(--text-soft); border-right: 1px solid var(--line-paper); }
+  .mode-btn:last-child{ border-right:none; }
+  .mode-btn.active{ background: var(--brass-deep); color:#fff; }
+  .reader-pagecount{ font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--text-soft); min-width:64px; text-align:right; }
+  .search-panel{ display:none; position:absolute; top:58px; right:28px; z-index:21; width:min(390px, calc(100vw - 28px)); max-height:min(520px, calc(100dvh - 140px)); background:var(--paper); border:1px solid var(--line-paper); border-radius:12px; box-shadow:0 18px 44px rgba(34,30,24,.22); padding:12px; overflow:hidden; }
+  .search-panel.show{ display:flex; flex-direction:column; gap:10px; }
+  .search-row{ display:flex; gap:8px; }
+  .search-row input{ flex:1; min-width:0; padding:11px 12px; border-radius:9px; border:1px solid var(--line-paper); background:#fff; color:var(--text); font-family:'JetBrains Mono', monospace; font-size:12px; }
+  .search-row .btn-secondary{ padding:8px 11px; }
+  .search-meta{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-soft); }
+  .search-nav{ display:flex; gap:6px; }
+  .search-nav button{ border:1px solid var(--line-paper); background:#fff; color:var(--text); border-radius:7px; padding:6px 8px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:10.5px; }
+  .search-nav button:disabled{ opacity:.42; cursor:default; }
+  .search-results{ overflow:auto; display:grid; gap:8px; padding-right:2px; }
+  .search-result{ text-align:left; border:1px solid var(--line-paper); background:#fff; color:var(--text); border-radius:9px; padding:10px 11px; cursor:pointer; font-family:'Source Serif 4', Georgia, serif; }
+  .search-result:hover, .search-result.active{ border-color:var(--brass-deep); box-shadow:0 0 0 2px rgba(180,137,79,.18); }
+  .search-result-page{ display:block; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--brass-deep); margin-bottom:4px; }
+  .search-result-snippet{ font-size:13px; line-height:1.45; color:var(--text-soft); }
+  mark.search-hit{ background:rgba(180,137,79,.34); color:inherit; border-radius:3px; padding:0 .04em; }
+  mark.search-hit.active{ background:var(--brass); color:#17140F; }
+  body.theme-dark .search-panel, body.theme-black .search-panel, body.theme-dark .search-row input, body.theme-black .search-row input, body.theme-dark .search-nav button, body.theme-black .search-nav button, body.theme-dark .search-result, body.theme-black .search-result{ background:#211D18; color:var(--text); }
+  body.theme-sepia .search-panel, body.theme-warm .search-panel, body.theme-contrast .search-panel, body.theme-sepia .search-row input, body.theme-warm .search-row input, body.theme-contrast .search-row input, body.theme-sepia .search-nav button, body.theme-warm .search-nav button, body.theme-contrast .search-nav button, body.theme-sepia .search-result, body.theme-warm .search-result, body.theme-contrast .search-result{ background:var(--paper); color:var(--text); }
+  .settings-btn{ border:1px solid var(--line-paper); background:#fff; color:var(--text-soft); border-radius:8px; padding:7px 10px; cursor:pointer; font-family:'Fraunces', serif; font-weight:600; font-size:13px; }
+  .settings-btn:hover, .settings-btn.active{ border-color:var(--brass-deep); color:var(--brass-deep); }
+  .settings-panel{ display:none; position:absolute; top:58px; right:28px; z-index:20; width:min(320px, calc(100vw - 28px)); background:var(--paper); border:1px solid var(--line-paper); border-radius:12px; box-shadow:0 18px 44px rgba(34,30,24,.22); padding:12px; }
+  .settings-panel.show{ display:block; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:9px 4px; border-bottom:1px solid var(--line-paper); font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-soft); }
+  .settings-row:last-child{ border-bottom:none; }
+  .settings-stepper{ display:flex; align-items:center; gap:6px; }
+  .settings-stepper button{ border:1px solid var(--line-paper); background:#fff; color:var(--text); border-radius:7px; min-width:32px; padding:6px 8px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; }
+  .settings-stepper button.active{ background:var(--brass-deep); color:#fff; border-color:var(--brass-deep); }
+  .settings-stepper strong{ min-width:44px; text-align:center; color:var(--text); font-weight:500; }
+  .theme-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:7px; width:100%; }
+  .theme-choice{ border:1px solid var(--line-paper); background:#fff; color:var(--text); border-radius:9px; padding:8px 6px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:10.5px; display:flex; align-items:center; justify-content:center; gap:5px; }
+  .theme-choice::before{ content:''; width:12px; height:12px; border-radius:50%; border:1px solid rgba(0,0,0,.18); background:var(--swatch, #fff); flex-shrink:0; }
+  .theme-choice.active{ border-color:var(--brass-deep); box-shadow:0 0 0 2px rgba(180,137,79,.28); color:var(--brass-deep); }
+  .theme-choice[data-theme="light"]{ --swatch:#FBF8F2; }
+  .theme-choice[data-theme="sepia"]{ --swatch:#F2E4C8; }
+  .theme-choice[data-theme="warm"]{ --swatch:#FFF4E6; }
+  .theme-choice[data-theme="dark"]{ --swatch:#171512; }
+  .theme-choice[data-theme="black"]{ --swatch:#050505; }
+  .theme-choice[data-theme="contrast"]{ --swatch:linear-gradient(90deg,#fff 0 50%,#005FCC 50%); }
+
+  .reader-body{ flex:1; display:flex; overflow:hidden; position:relative; background: #DED4BE; perspective: 1800px; }
+  #chapter-label{ position:absolute; top:10px; left:50%; transform:translateX(-50%); font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color: var(--brass-deep); background: var(--paper); padding: 2px 10px; border-radius: 20px; z-index:2; display:none; }
+
+  /* reflow (txt/epub) */
+  #reflow-viewport{ flex:1; overflow:hidden; padding: 30px 34px; position:relative; touch-action: pan-y; }
+  #reflow-viewport.zoomed{ touch-action: none; }
+  #reflow-viewport.spread::before{ content:''; position:absolute; left:50%; top:24px; bottom:24px; width:1px; background: rgba(34,30,24,0.15); box-shadow: 0 0 14px 4px rgba(34,30,24,0.1); z-index:1; pointer-events:none; }
+  #reflow-zoom-layer{ width:100%; height:100%; transform-origin: center center; }
+  #reflow-zoom-layer.can-zoom{ cursor: grab; }
+  #reflow-zoom-layer.dragging{ cursor: grabbing; }
+  #reflow-zoom-layer.dragging, #reflow-zoom-layer.dragging *{ user-select: none; }
+  #reflow-content{ font-size: var(--reader-font-size); line-height: var(--reader-line-height); column-fill: auto; will-change: transform; background: var(--paper); box-shadow: 0 10px 30px rgba(34,30,24,0.16); border-radius: 3px; padding: var(--reader-pad-y) var(--reader-pad-x); user-select: text; }
+  #reflow-content p{ margin: 0 0 1.1em; }
+  #reflow-content h1, #reflow-content h2, #reflow-content h3, #reflow-content h4{ font-family:'Fraunces', serif; margin: 1.3em 0 0.6em; line-height:1.25; }
+  #reflow-content img{ max-width:100%; height:auto; display:block; margin: 0.8em auto; break-inside: avoid; }
+  #reflow-content blockquote{ margin: 1em 1.4em; font-style: italic; color: var(--text-soft); }
+  #reflow-content .chapter{ break-before: column; }
+  #reflow-content .chapter:first-child{ break-before: auto; }
+
+  /* ---------- adaptive page movement animation ---------- */
+  .reader-body.page-animating{ pointer-events:none; }
+  .flip-leaf{ position:absolute; inset:24px 34px; z-index:6; transform-style:preserve-3d; -webkit-transform-style:preserve-3d; pointer-events:none; transition: transform 0.5s cubic-bezier(.28,.02,.16,1); filter: drop-shadow(0 18px 34px rgba(34,30,24,0.34)); }
+  .flip-face{ position:absolute; inset:0; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; background: var(--paper); border-radius:4px; box-shadow: inset 0 0 0 1px rgba(34,30,24,0.08); transition: opacity 0.001s linear; }
+  .flip-face > *{ margin:0 !important; box-shadow:none !important; }
+  .flip-front{ transform: translateZ(0.6px); -webkit-transform: translateZ(0.6px); opacity:1; }
+  .flip-back{ transform:rotateY(180deg) translateZ(0.6px); -webkit-transform:rotateY(180deg) translateZ(0.6px); opacity:0; }
+  .flip-leaf.past-half .flip-front{ opacity:0; }
+  .flip-leaf.past-half .flip-back{ opacity:1; }
+  .flip-face::before{ content:''; position:absolute; top:0; bottom:0; width:22%; pointer-events:none; opacity:.75; z-index:2; }
+  .flip-leaf.dir-next .flip-face::before{ right:0; background:radial-gradient(120% 60% at 100% 50%, rgba(0,0,0,.28), transparent 58%), linear-gradient(to left, rgba(255,255,255,.3), transparent 58%); }
+  .flip-leaf.dir-prev .flip-face::before{ left:0; background:radial-gradient(120% 60% at 0% 50%, rgba(0,0,0,.28), transparent 58%), linear-gradient(to right, rgba(255,255,255,.3), transparent 58%); }
+  .flip-face::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:0; transition: opacity .5s ease; }
+  .flip-leaf.dir-next .flip-front::after{ opacity:1; background:linear-gradient(to right, rgba(255,255,255,.02), rgba(0,0,0,.24)); }
+  .flip-leaf.dir-next .flip-back::after{ opacity:1; background:linear-gradient(to left, rgba(255,255,255,.08), rgba(0,0,0,.16)); }
+  .flip-leaf.dir-prev .flip-front::after{ opacity:1; background:linear-gradient(to left, rgba(255,255,255,.02), rgba(0,0,0,.24)); }
+  .flip-leaf.dir-prev .flip-back::after{ opacity:1; background:linear-gradient(to right, rgba(255,255,255,.08), rgba(0,0,0,.16)); }
+  .preturn-hold{ position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden; background:#DED4BE; }
+  .slide-stage{ position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden; background:#DED4BE; }
+  .slide-panel{ position:absolute; inset:0; transition: transform .5s cubic-bezier(.28,.02,.16,1), opacity .5s ease; will-change: transform, opacity; }
+  .slide-stage.dir-next .slide-current{ transform:translateX(0); opacity:1; }
+  .slide-stage.dir-next .slide-next{ transform:translateX(18%); opacity:.35; }
+  .slide-stage.dir-prev .slide-current{ transform:translateX(0); opacity:1; }
+  .slide-stage.dir-prev .slide-next{ transform:translateX(-18%); opacity:.35; }
+  .slide-stage.animate.dir-next .slide-current{ transform:translateX(-18%); opacity:.25; }
+  .slide-stage.animate.dir-next .slide-next{ transform:translateX(0); opacity:1; }
+  .slide-stage.animate.dir-prev .slide-current{ transform:translateX(18%); opacity:.25; }
+  .slide-stage.animate.dir-prev .slide-next{ transform:translateX(0); opacity:1; }
+
+  /* paged (pdf) */
+  #pdf-viewport{ flex:1; overflow:hidden; position:relative; touch-action: pan-y; }
+  #pdf-zoom-layer{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .pdf-page-wrap{ position:relative; flex-shrink:0; touch-action: pan-y; overflow:hidden; }
+  .pdf-page-wrap.zoomed{ touch-action: none; }
+  .pdf-page-zoom-layer{ width:100%; height:100%; transform-origin: center center; }
+  .pdf-page-zoom-layer.can-zoom{ cursor: grab; }
+  .pdf-page-zoom-layer.dragging{ cursor: grabbing; }
+  #pdf-pages{ display:flex; gap: 18px; align-items:center; position:relative; }
+  #pdf-pages.spread::before{ content:''; position:absolute; left:50%; top:0; bottom:0; width:1px; background: rgba(34,30,24,0.15); box-shadow: 0 0 14px 4px rgba(34,30,24,0.12); }
+  .pdf-page-canvas{ background:#fff; box-shadow: 0 6px 22px rgba(34,30,24,0.18); }
+
+  .reader-controls{ display:flex; align-items:center; justify-content:space-between; padding: 14px 28px; border-top: 1px solid var(--line-paper); flex-shrink:0; }
+  .page-btn{ padding: 10px 18px; border-radius: var(--radius); border: 1px solid var(--line-paper); background:#fff; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+  .page-btn:hover:not(:disabled){ border-color: var(--brass-deep); color: var(--brass-deep); }
+  .page-btn:disabled{ opacity:0.35; cursor:default; }
+  .page-jump{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-soft); }
+
+  /* ---------- book hold popover ---------- */
+  .delete-popover{ position:fixed; z-index:70; min-width: 190px; max-width: min(280px, calc(100vw - 24px)); background: var(--paper); border:1px solid var(--line-paper); border-radius:12px; box-shadow:0 18px 44px rgba(20,17,12,.28); padding:10px; display:none; }
+  .delete-popover.show{ display:block; }
+  .delete-popover::before{ content:''; position:absolute; top:-7px; left:22px; width:12px; height:12px; transform:rotate(45deg); background:var(--paper); border-left:1px solid var(--line-paper); border-top:1px solid var(--line-paper); }
+  .popover-title{ font-family:'Fraunces', serif; font-weight:600; font-size:14px; line-height:1.25; margin:2px 4px 8px; color:var(--text); }
+  .popover-sub{ font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-soft); margin:0 4px 10px; }
+  .popover-actions{ display:flex; gap:8px; }
+  .popover-actions button{ flex:1; padding:9px 10px; border-radius:8px; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; }
+
+  .turn-prep{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%) translateY(8px); z-index:12; background:rgba(20,17,12,.82); color:#F5EFE3; border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:8px 13px; font-family:'JetBrains Mono', monospace; font-size:11px; opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; }
+  .turn-prep.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .shortcut-list{ display:grid; gap:10px; margin:8px 0 22px; }
+  .shortcut-list div{ display:flex; align-items:center; gap:12px; color:var(--text-soft); font-size:14px; }
+  kbd{ min-width:42px; text-align:center; border:1px solid var(--line-paper); border-bottom-width:2px; border-radius:7px; padding:5px 7px; background:#fff; color:var(--text); font-family:'JetBrains Mono', monospace; font-size:11px; }
+  body.theme-dark kbd, body.theme-black kbd{ background:#211D18; }
+  body.theme-sepia kbd, body.theme-warm kbd, body.theme-contrast kbd{ background:var(--paper); }
+
+  /* ---------- confirm modal ---------- */
+  .modal-overlay{ position:fixed; inset:0; background: rgba(20,17,12,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding: 20px; }
+  .modal-overlay.show{ display:flex; }
+  .modal-card{ background: var(--paper); border-radius: var(--radius); padding: 26px 28px; max-width: 380px; width:100%; box-shadow: 0 20px 50px rgba(0,0,0,0.35); }
+  .modal-title{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; margin:0 0 8px; }
+  .modal-text{ font-size:14px; color:var(--text-soft); line-height:1.55; margin:0 0 22px; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; }
+  .btn-secondary{ padding:10px 16px; border-radius:8px; border:1px solid var(--line-paper); background:#fff; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:12px; }
+  .btn-secondary:hover{ border-color: var(--brass-deep); color: var(--brass-deep); }
+  .btn-danger{ padding:10px 16px; border-radius:8px; border:none; background: var(--danger); color:#fff; cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:12px; }
+  .btn-danger:hover{ opacity:0.9; }
+
+  @media (max-width: 760px){
+    body.reader-open #sidebar{ display:none; }
+    #sidebar{ width: clamp(72px, 22vw, 88px); }
+    .brand{ padding-left:12px; padding-right:12px; }
+    .brand-tag, .shelf-label{ display:none; }
+    .new-book-btn{ margin-left:10px; margin-right:10px; justify-content:center; }
+    .new-book-btn span.label-text{ display:none; }
+    .main-inner{ padding: 40px 18px 60px; }
+    h1.page-title{ font-size: clamp(26px, 8vw, 34px); }
+    .lede{ font-size:15px; }
+    .reader-topbar{ padding: 10px 12px; gap:8px; flex-wrap:wrap; }
+    .reader-title-block{ order:3; flex-basis:100%; }
+    .topbar-right{ margin-left:auto; gap:8px; }
+    .mode-btn{ padding:7px 9px; }
+    .reader-pagecount{ min-width:50px; }
+    .settings-panel{ top:96px; right:12px; }
+    .search-panel{ top:96px; right:12px; width:calc(100vw - 24px); max-height:calc(100dvh - 170px); }
+    .theme-row{ align-items:flex-start; flex-direction:column; }
+    #reflow-viewport{ padding: 22px 14px; }
+    #reflow-content{ font-size: clamp(16px, 4.4vw, var(--reader-font-size)); line-height:var(--reader-line-height); padding: calc(var(--reader-pad-y) * .8) calc(var(--reader-pad-x) * .7); }
+    .reader-controls{ padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); gap:8px; }
+    .page-btn{ padding:9px 12px; font-size:12px; }
+    .page-jump{ font-size:11px; text-align:center; }
+    .reader-author{ display:none; }
+    .flip-leaf{ inset:18px 14px; }
+  }
+  @media (max-width: 560px){
+    .tabs{ overflow-x:auto; }
+    .link-row{ flex-direction:column; }
+    .btn-primary{ width:100%; }
+    #dropzone{ padding:34px 16px; }
+    .continue-grid{ grid-template-columns:1fr; }
+    .reader-controls{ justify-content:center; flex-wrap:wrap; }
+    .page-jump{ order:3; flex-basis:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="brand">
+    <span class="brand-mark">Foxed</span>
+    <span class="brand-tag">a shelf that remembers</span>
+  </div>
+  <button class="new-book-btn" id="new-book-btn">＋ <span class="label-text">New book</span></button>
+  <div class="shelf-label">Your shelf</div>
+  <div id="shelf-wrap"></div>
+  <div class="sidebar-foot">
+    <div>local library · private</div>
+    <div class="backup-actions">
+      <button id="export-library-btn">Export</button>
+      <button id="import-library-btn">Import</button>
+    </div>
+    <input type="file" id="import-library-input" accept="application/json,.json" style="display:none" aria-label="Import Foxed library backup">
+  </div>
+</div>
+
+<div id="main">
+
+  <div id="landing-view" class="main-inner">
+    <p class="eyebrow">New book</p>
+    <h1 class="page-title">Open something to read.</h1>
+    <p class="lede">Upload a file from your computer, or hand Foxed a link and it'll fetch the book itself. Everything opens as an actual book &mdash; real pages, not extracted text &mdash; and you can read it one page at a time or as a two-page spread.</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="upload">Upload a file</button>
+      <button class="tab-btn" data-tab="link">From a link</button>
+    </div>
+
+    <div class="panel active" id="panel-upload">
+      <div id="dropzone" role="button" tabindex="0" aria-label="Drop a book here or click to choose a TXT, PDF, or EPUB file">
+        <p class="drop-title">Drop a book here, or click to choose one</p>
+        <p class="drop-sub">.TXT · .PDF · .EPUB</p>
+      </div>
+      <input type="file" id="file-input" accept=".txt,.pdf,.epub" aria-label="Choose a TXT, PDF, or EPUB book file" style="display:none">
+    </div>
+
+    <div class="panel" id="panel-link">
+      <div class="link-row">
+        <input type="url" id="link-input" aria-label="Book file URL" placeholder="https://www.gutenberg.org/files/1342/1342-0.txt">
+        <button class="btn-primary" id="link-fetch-btn">Fetch book</button>
+      </div>
+      <p class="hint">Works best with direct links to a .txt, .epub, or .pdf file. Some sites block cross-origin requests — if a link fails, try downloading the file and uploading it instead.</p>
+    </div>
+
+    <div class="error-banner" id="error-banner" role="alert" aria-live="polite"></div>
+
+    <div class="continue-section" id="continue-section" style="display:none;">
+      <div class="continue-heading">Continue reading</div>
+      <div class="continue-grid" id="continue-grid"></div>
+    </div>
+  </div>
+
+  <div id="loading-view">
+    <div class="spinner"></div>
+    <div id="loading-msg">Opening the book…</div>
+  </div>
+
+  <div id="reader-view">
+    <div class="reader-topbar">
+      <button class="back-btn" id="back-btn">← Shelf</button>
+      <div class="reader-title-block">
+        <p class="reader-title" id="reader-title"></p>
+        <p class="reader-author" id="reader-author"></p>
+      </div>
+      <div class="topbar-right">
+        <div class="mode-toggle">
+          <button class="mode-btn" data-mode="1" id="mode-1">1 page</button>
+          <button class="mode-btn" data-mode="2" id="mode-2">2 pages</button>
+        </div>
+        <button class="settings-btn" id="search-btn" aria-expanded="false" aria-controls="search-panel" aria-label="Search in book">⌕</button>
+        <button class="settings-btn" id="settings-btn" aria-expanded="false" aria-controls="settings-panel">Aa</button>
+        <button class="settings-btn" id="shortcuts-btn" aria-label="Keyboard shortcuts">?</button>
+        <div class="reader-pagecount" id="reader-pagecount"></div>
+      </div>
+    </div>
+    <div class="search-panel" id="search-panel" aria-hidden="true">
+      <div class="search-row">
+        <input type="search" id="book-search-input" placeholder="Search this book…" aria-label="Search this book">
+        <button class="btn-secondary" id="book-search-close" aria-label="Close search">×</button>
+      </div>
+      <div class="search-meta">
+        <span id="book-search-count">Type 2+ characters</span>
+        <div class="search-nav">
+          <button id="search-prev" disabled>Previous</button>
+          <button id="search-next" disabled>Next</button>
+        </div>
+      </div>
+      <div class="search-results" id="book-search-results"></div>
+    </div>
+    <div class="settings-panel" id="settings-panel" aria-hidden="true">
+      <div class="settings-row">
+        <span>Text size</span>
+        <div class="settings-stepper"><button id="font-down">−</button><strong id="font-value">100%</strong><button id="font-up">+</button></div>
+      </div>
+      <div class="settings-row">
+        <span>Line spacing</span>
+        <div class="settings-stepper"><button id="line-down">−</button><strong id="line-value">100%</strong><button id="line-up">+</button></div>
+      </div>
+      <div class="settings-row">
+        <span>Margins</span>
+        <div class="settings-stepper"><button id="margin-down">−</button><strong id="margin-value">100%</strong><button id="margin-up">+</button></div>
+      </div>
+      <div class="settings-row theme-row">
+        <span>Theme</span>
+        <div class="theme-grid" role="group" aria-label="Reader theme">
+          <button class="theme-choice" data-theme="light" aria-pressed="true">Paper</button>
+          <button class="theme-choice" data-theme="sepia" aria-pressed="false">Sepia</button>
+          <button class="theme-choice" data-theme="warm" aria-pressed="false">Warm</button>
+          <button class="theme-choice" data-theme="dark" aria-pressed="false">Dark</button>
+          <button class="theme-choice" data-theme="black" aria-pressed="false">Black</button>
+          <button class="theme-choice" data-theme="contrast" aria-pressed="false">Contrast</button>
+        </div>
+      </div>
+    </div>
+    <div class="reader-body" id="reader-body">
+      <div id="chapter-label"></div>
+      <div id="reflow-viewport" style="display:none;">
+        <div class="page-zoom corner-left" id="reflow-zoom-left">
+          <button class="pz-out" title="Zoom out">−</button><span class="pz-level">100%</span><button class="pz-in" title="Zoom in">+</button>
+        </div>
+        <div class="page-zoom corner-right" id="reflow-zoom-right">
+          <button class="pz-out" title="Zoom out">−</button><span class="pz-level">100%</span><button class="pz-in" title="Zoom in">+</button>
+        </div>
+        <div id="reflow-zoom-layer"><div id="reflow-content"></div></div>
+      </div>
+      <div id="pdf-viewport" style="display:none;">
+        <div id="pdf-zoom-layer"><div id="pdf-pages"></div></div>
+      </div>
+      <div class="turn-prep" id="turn-prep" aria-live="polite">Preparing page…</div>
+    </div>
+    <div class="reader-controls">
+      <button class="page-btn" id="prev-btn">← Previous</button>
+      <span class="page-jump" id="page-jump"></span>
+      <button class="page-btn" id="next-btn">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="delete-popover" id="book-popover" role="menu" aria-hidden="true">
+  <div class="popover-title" id="book-popover-title">Book options</div>
+  <p class="popover-sub">Hold detected</p>
+  <div class="popover-actions">
+    <button class="btn-danger" id="popover-delete-btn" role="menuitem">Delete book</button>
+    <button class="btn-secondary" id="popover-cancel-btn" role="menuitem">Cancel</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-card">
+    <p class="modal-title">Remove this book?</p>
+    <p class="modal-text" id="confirm-modal-text"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="confirm-cancel-btn">Cancel</button>
+      <button class="btn-danger" id="confirm-remove-btn">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+  <div class="modal-card shortcuts-card">
+    <p class="modal-title" id="shortcuts-title">Shortcuts</p>
+    <div class="shortcut-list">
+      <div><kbd>←</kbd><span>Previous page</span></div>
+      <div><kbd>→</kbd><span>Next page</span></div>
+      <div><kbd>Del</kbd><span>Delete focused book from shelf</span></div>
+      <div><kbd>Esc</kbd><span>Close popovers and dialogs</span></div>
+      <div><kbd>Swipe</kbd><span>Turn pages on touch devices</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="shortcuts-close-btn">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SPINE_COLORS = ['#6B3F3F','#3F5566','#4F6B4A','#5B4A73','#735A3F','#3F6B63','#6B5A3F'];
+  function pickColor(str){
+    var h = 0;
+    for (var i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+    return SPINE_COLORS[h % SPINE_COLORS.length];
+  }
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function uid(){ return 'b_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+
+  function arrayBufferToBase64(buffer){
+    var bytes = new Uint8Array(buffer);
+    var chunkSize = 0x8000;
+    var binary = '';
+    for (var i=0; i<bytes.length; i+=chunkSize){
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunkSize));
+    }
+    return btoa(binary);
+  }
+  function base64ToArrayBuffer(base64){
+    var binary = atob(base64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  var library = [];
+  var currentBookId = null;
+  var pagesPerView = 1;
+  var readerPrefs = { fontScale: 1, lineScale: 1, marginScale: 1, theme: 'light' };
+  var THEMES = ['light','sepia','warm','dark','black','contrast'];
+  var pdfjsLib = window.pdfjsLib || null;
+  var pdfjsReady = null;
+
+  var reflowState = { totalScreens: 1, pageIndex: 0 };
+  var zoomState = { level: 1, panX: 0, panY: 0, dragging: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0, pointerId: null };
+  var ZOOM_MIN = 1, ZOOM_MAX = 2.5, ZOOM_STEP = 0.25;
+  var MAX_UPLOAD_BYTES = 60 * 1024 * 1024;
+  var MAX_LINK_BYTES = 60 * 1024 * 1024;
+
+  function clampNumber(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+  async function ensurePdfJs(){
+    if (pdfjsLib) return pdfjsLib;
+    if (!pdfjsReady){
+      pdfjsReady = import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs').then(function(mod){
+        pdfjsLib = mod;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.mjs';
+        return pdfjsLib;
+      });
+    }
+    return pdfjsReady;
+  }
+
+  function applyReaderSettings(){
+    var root = document.documentElement;
+    root.style.setProperty('--reader-font-size', Math.round(18 * readerPrefs.fontScale) + 'px');
+    root.style.setProperty('--reader-line-height', (1.85 * readerPrefs.lineScale).toFixed(2));
+    root.style.setProperty('--reader-pad-y', Math.round(30 * readerPrefs.marginScale) + 'px');
+    root.style.setProperty('--reader-pad-x', Math.round(34 * readerPrefs.marginScale) + 'px');
+    THEMES.forEach(function(theme){ document.body.classList.remove('theme-' + theme); });
+    if (readerPrefs.theme !== 'light') document.body.classList.add('theme-' + readerPrefs.theme);
+    var fontVal = document.getElementById('font-value');
+    var lineVal = document.getElementById('line-value');
+    var marginVal = document.getElementById('margin-value');
+    if (fontVal) fontVal.textContent = Math.round(readerPrefs.fontScale * 100) + '%';
+    if (lineVal) lineVal.textContent = Math.round(readerPrefs.lineScale * 100) + '%';
+    if (marginVal) marginVal.textContent = Math.round(readerPrefs.marginScale * 100) + '%';
+    document.querySelectorAll('.theme-choice').forEach(function(btn){
+      var active = btn.getAttribute('data-theme') === readerPrefs.theme;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function updateReaderLayoutAfterSettings(){
+    var meta = currentMeta();
+    if (!meta || document.getElementById('reader-view').style.display !== 'flex') return;
+    resetZoom();
+    if (meta.contentType === 'reflow'){
+      var fraction = reflowState.totalScreens > 1 ? reflowState.pageIndex / (reflowState.totalScreens - 1) : 0;
+      layoutReflow(fraction);
+    } else if (meta.contentType === 'paged'){
+      renderPdfPages();
+    }
+  }
+
+  // Shared zoom for the reflow (txt/epub) reading surface. Both corner button
+  // clusters drive this same state since reflowed text is one continuous surface.
+  // The viewport frame itself never resizes — only the content layer inside it
+  // scales and pans, clipped by the viewport's own overflow:hidden.
+  function clampPan(){
+    var layer = document.getElementById('reflow-zoom-layer');
+    var viewport = document.getElementById('reflow-viewport');
+    var maxPanX = Math.max(0, (layer.offsetWidth * zoomState.level - viewport.clientWidth) / 2);
+    var maxPanY = Math.max(0, (layer.offsetHeight * zoomState.level - viewport.clientHeight) / 2);
+    zoomState.panX = Math.max(-maxPanX, Math.min(maxPanX, zoomState.panX));
+    zoomState.panY = Math.max(-maxPanY, Math.min(maxPanY, zoomState.panY));
+  }
+
+  function applyZoomTransform(){
+    var layer = document.getElementById('reflow-zoom-layer');
+    var viewport = document.getElementById('reflow-viewport');
+    layer.style.transform = 'translate(' + zoomState.panX + 'px, ' + zoomState.panY + 'px) scale(' + zoomState.level + ')';
+    layer.classList.toggle('can-zoom', zoomState.level > 1);
+    layer.classList.toggle('dragging', zoomState.dragging);
+    viewport.classList.toggle('zoomed', zoomState.level > 1);
+  }
+
+  function updateZoomUI(){
+    var pct = Math.round(zoomState.level * 100) + '%';
+    document.querySelectorAll('#reflow-zoom-left .pz-level, #reflow-zoom-right .pz-level').forEach(function(el){ el.textContent = pct; });
+    document.querySelectorAll('#reflow-zoom-left .pz-out, #reflow-zoom-right .pz-out').forEach(function(el){ el.disabled = zoomState.level <= ZOOM_MIN; });
+    document.querySelectorAll('#reflow-zoom-left .pz-in, #reflow-zoom-right .pz-in').forEach(function(el){ el.disabled = zoomState.level >= ZOOM_MAX; });
+  }
+
+  function updateReflowZoomCorners(){
+    var leftEl = document.getElementById('reflow-zoom-left');
+    var rightEl = document.getElementById('reflow-zoom-right');
+    if (effectivePagesPerView() === 2){
+      leftEl.style.display = 'flex';
+      rightEl.style.display = 'flex';
+    } else {
+      var odd = (reflowState.pageIndex + 1) % 2 === 1;
+      leftEl.style.display = odd ? 'none' : 'flex';
+      rightEl.style.display = odd ? 'flex' : 'none';
+    }
+  }
+
+  function resetZoom(){
+    zoomState.level = 1; zoomState.panX = 0; zoomState.panY = 0; zoomState.dragging = false;
+    updateZoomUI();
+    applyZoomTransform();
+  }
+
+  function setZoom(level){
+    zoomState.level = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, level));
+    clampPan();
+    updateZoomUI();
+    applyZoomTransform();
+  }
+
+  function zoomPointerDown(e){
+    if (zoomState.level <= 1) return;
+    zoomState.dragging = true;
+    zoomState.startX = e.clientX; zoomState.startY = e.clientY;
+    zoomState.startPanX = zoomState.panX; zoomState.startPanY = zoomState.panY;
+    zoomState.pointerId = e.pointerId;
+    try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
+    applyZoomTransform();
+    e.preventDefault();
+  }
+  function zoomPointerMove(e){
+    if (!zoomState.dragging || e.pointerId !== zoomState.pointerId) return;
+    zoomState.panX = zoomState.startPanX + (e.clientX - zoomState.startX);
+    zoomState.panY = zoomState.startPanY + (e.clientY - zoomState.startY);
+    clampPan();
+    applyZoomTransform();
+  }
+  function zoomPointerUp(e){
+    if (e.pointerId !== zoomState.pointerId) return;
+    zoomState.dragging = false;
+    zoomState.pointerId = null;
+    applyZoomTransform();
+  }
+
+  // Independent, self-contained zoom for a single PDF page. Each rendered page
+  // gets its own instance so zooming one page never affects its neighbor.
+  function buildPdfPageUnit(canvas, pageNum){
+    var wrap = document.createElement('div');
+    wrap.className = 'pdf-page-wrap';
+    wrap.style.width = canvas.width + 'px';
+    wrap.style.height = canvas.height + 'px';
+
+    var zLayer = document.createElement('div');
+    zLayer.className = 'pdf-page-zoom-layer';
+    zLayer.appendChild(canvas);
+    wrap.appendChild(zLayer);
+
+    var odd = pageNum % 2 === 1;
+    var controls = document.createElement('div');
+    controls.className = 'page-zoom ' + (odd ? 'corner-right' : 'corner-left');
+    controls.innerHTML = '<button class="pz-out" title="Zoom out">\u2212</button><span class="pz-level">100%</span><button class="pz-in" title="Zoom in">+</button>';
+    wrap.appendChild(controls);
+
+    var state = { level: 1, panX: 0, panY: 0, dragging: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0, pointerId: null };
+    var levelEl = controls.querySelector('.pz-level');
+    var outBtn = controls.querySelector('.pz-out');
+    var inBtn = controls.querySelector('.pz-in');
+
+    function apply(){
+      zLayer.style.transform = 'translate(' + state.panX + 'px, ' + state.panY + 'px) scale(' + state.level + ')';
+      zLayer.classList.toggle('can-zoom', state.level > 1);
+      zLayer.classList.toggle('dragging', state.dragging);
+      levelEl.textContent = Math.round(state.level * 100) + '%';
+      outBtn.disabled = state.level <= ZOOM_MIN;
+      inBtn.disabled = state.level >= ZOOM_MAX;
+    }
+    function clamp(){
+      var maxX = Math.max(0, (canvas.width * state.level - canvas.width) / 2);
+      var maxY = Math.max(0, (canvas.height * state.level - canvas.height) / 2);
+      state.panX = Math.max(-maxX, Math.min(maxX, state.panX));
+      state.panY = Math.max(-maxY, Math.min(maxY, state.panY));
+    }
+    function setLevel(l){
+      state.level = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, l));
+      clamp(); apply();
+    }
+    outBtn.addEventListener('click', function(){ setLevel(state.level - ZOOM_STEP); });
+    inBtn.addEventListener('click', function(){ setLevel(state.level + ZOOM_STEP); });
+
+    zLayer.addEventListener('pointerdown', function(e){
+      if (state.level <= 1) return;
+      state.dragging = true;
+      state.startX = e.clientX; state.startY = e.clientY;
+      state.startPanX = state.panX; state.startPanY = state.panY;
+      state.pointerId = e.pointerId;
+      try{ e.target.setPointerCapture(e.pointerId); }catch(err){}
+      apply();
+      e.preventDefault();
+    });
+    zLayer.addEventListener('pointermove', function(e){
+      if (!state.dragging || e.pointerId !== state.pointerId) return;
+      state.panX = state.startPanX + (e.clientX - state.startX);
+      state.panY = state.startPanY + (e.clientY - state.startY);
+      clamp(); apply();
+    });
+    function endDrag(e){
+      if (e.pointerId !== state.pointerId) return;
+      state.dragging = false; state.pointerId = null; apply();
+    }
+    zLayer.addEventListener('pointerup', endDrag);
+    zLayer.addEventListener('pointercancel', endDrag);
+
+    apply();
+    return wrap;
+  }
+
+  var pdfState = { doc: null, pageIndex: 0, rendering: false };
+  var searchState = { query: '', results: [], activeIndex: -1, timer: null, token: 0 };
+  var isFlipping = false;
+
+  function reducedMotion(){
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function captureReflowFrontFace(pageIndex){
+    var viewport = document.getElementById('reflow-viewport');
+    var clone = viewport.cloneNode(true);
+    var contentClone = clone.querySelector('#reflow-content');
+    if (contentClone && pageIndex != null){
+      var vw = reflowInnerSize(viewport).w;
+      contentClone.style.transform = 'translateX(-' + (pageIndex * vw) + 'px)';
+    }
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); });
+    clone.querySelectorAll('.page-zoom').forEach(function(el){ el.remove(); });
+    clone.style.display = 'block';
+    clone.style.position = 'absolute';
+    clone.style.inset = '0';
+    clone.style.width = '100%';
+    clone.style.height = '100%';
+    clone.style.overflow = 'hidden';
+    return clone;
+  }
+
+  function rectRelativeToReader(el){
+    var host = document.getElementById('reader-body').getBoundingClientRect();
+    var r = el.getBoundingClientRect();
+    return { left: r.left - host.left, top: r.top - host.top, width: r.width, height: r.height };
+  }
+
+  function applyAnimationRect(el, rect){
+    if (!rect) return;
+    el.style.inset = 'auto';
+    el.style.left = rect.left + 'px';
+    el.style.top = rect.top + 'px';
+    el.style.width = rect.width + 'px';
+    el.style.height = rect.height + 'px';
+  }
+
+  function reflowPageRect(side){
+    var viewport = document.getElementById('reflow-viewport');
+    var vRect = rectRelativeToReader(viewport);
+    var cs = getComputedStyle(viewport);
+    var padL = parseFloat(cs.paddingLeft) || 0;
+    var padT = parseFloat(cs.paddingTop) || 0;
+    var size = reflowInnerSize(viewport);
+    var gap = effectivePagesPerView() === 2 ? 56 : 0;
+    var colWidth = effectivePagesPerView() === 2 ? Math.max(220, Math.floor((size.w - gap) / 2)) : size.w;
+    return {
+      left: vRect.left + padL + (side === 'right' ? colWidth + gap : 0),
+      top: vRect.top + padT,
+      width: colWidth,
+      height: Math.max(1, size.h)
+    };
+  }
+
+  function captureReflowPageFace(side, pageIndex){
+    var viewport = document.getElementById('reflow-viewport');
+    var content = document.getElementById('reflow-content');
+    var size = reflowInnerSize(viewport);
+    var gap = effectivePagesPerView() === 2 ? 56 : 0;
+    var colWidth = effectivePagesPerView() === 2 ? Math.max(220, Math.floor((size.w - gap) / 2)) : size.w;
+    var sideOffset = side === 'right' ? colWidth + gap : 0;
+    var index = pageIndex == null ? reflowState.pageIndex : pageIndex;
+
+    var clone = content.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.position = 'absolute';
+    clone.style.top = '0';
+    clone.style.left = (-sideOffset) + 'px';
+    clone.style.transform = 'translateX(-' + (index * size.w) + 'px)';
+    clone.style.margin = '0';
+    clone.style.boxShadow = 'none';
+    clone.style.borderRadius = '3px';
+    clone.style.maxWidth = 'none';
+
+    var wrap = document.createElement('div');
+    wrap.style.position = 'absolute';
+    wrap.style.inset = '0';
+    wrap.style.width = colWidth + 'px';
+    wrap.style.height = Math.max(1, size.h) + 'px';
+    wrap.style.overflow = 'hidden';
+    wrap.style.background = 'var(--paper)';
+    wrap.appendChild(clone);
+    return { node: wrap, rect: reflowPageRect(side) };
+  }
+
+  function capturePdfPageFace(side){
+    var pages = document.getElementById('pdf-pages');
+    var wraps = pages.querySelectorAll('.pdf-page-wrap');
+    if (!wraps.length) return { node: capturePdfFrontFace(), rect: null };
+    var index = side === 'right' && wraps.length > 1 ? 1 : 0;
+    var selected = wraps[index];
+    var canvas = selected.querySelector('canvas');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'absolute';
+    wrap.style.inset = '0';
+    wrap.style.overflow = 'hidden';
+    wrap.style.background = '#fff';
+    if (canvas){
+      var img = document.createElement('img');
+      img.src = canvas.toDataURL();
+      img.style.width = canvas.width + 'px';
+      img.style.height = canvas.height + 'px';
+      img.style.display = 'block';
+      img.style.maxWidth = 'none';
+      wrap.appendChild(img);
+    }
+    return { node: wrap, rect: rectRelativeToReader(selected) };
+  }
+
+  function pdfPageRect(side){
+    var pages = document.getElementById('pdf-pages');
+    var wraps = pages.querySelectorAll('.pdf-page-wrap');
+    if (!wraps.length) return null;
+    var index = side === 'right' && wraps.length > 1 ? 1 : 0;
+    return rectRelativeToReader(wraps[index]);
+  }
+
+  async function renderPdfPageFaceAt(pageIndex, side){
+    if (!pdfState.doc) return { node: document.createElement('div'), rect: null };
+    var pageNum = pageIndex + (side === 'right' && effectivePagesPerView() === 2 ? 2 : 1);
+    if (pageNum < 1 || pageNum > pdfState.doc.numPages) return { node: document.createElement('div'), rect: pdfPageRect(side) };
+    var page = await pdfState.doc.getPage(pageNum);
+    var baseViewport = page.getViewport({scale: 1});
+    var viewportEl = document.getElementById('pdf-viewport');
+    var ppv = effectivePagesPerView();
+    var availH = Math.max(120, viewportEl.clientHeight - 48);
+    var availW = ppv === 2 ? Math.max(120, (viewportEl.clientWidth - 18 - 48) / 2) : Math.max(120, viewportEl.clientWidth - 48);
+    var scale = Math.min(availH / baseViewport.height, availW / baseViewport.width);
+    var scaledViewport = page.getViewport({scale: scale});
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.floor(scaledViewport.width);
+    canvas.height = Math.floor(scaledViewport.height);
+    await page.render({canvasContext: canvas.getContext('2d'), viewport: scaledViewport}).promise;
+
+    var wrap = document.createElement('div');
+    wrap.style.position = 'absolute';
+    wrap.style.inset = '0';
+    wrap.style.overflow = 'hidden';
+    wrap.style.background = '#fff';
+    var img = document.createElement('img');
+    img.src = canvas.toDataURL();
+    img.style.width = canvas.width + 'px';
+    img.style.height = canvas.height + 'px';
+    img.style.display = 'block';
+    img.style.maxWidth = 'none';
+    wrap.appendChild(img);
+    return { node: wrap, rect: ppv === 2 ? pdfPageRect(side) : null };
+  }
+
+  async function renderPdfSpreadFaceAt(pageIndex){
+    var ppv = effectivePagesPerView();
+    var outer = document.createElement('div');
+    outer.style.position = 'absolute';
+    outer.style.inset = '0';
+    outer.style.display = 'flex';
+    outer.style.alignItems = 'center';
+    outer.style.justifyContent = 'center';
+    outer.style.gap = '18px';
+    var left = await renderPdfPageFaceAt(pageIndex, 'left');
+    if (left.node.firstChild){
+      var leftImg = left.node.firstChild.cloneNode(true);
+      leftImg.style.boxShadow = '0 6px 22px rgba(34,30,24,0.18)';
+      outer.appendChild(leftImg);
+    }
+    if (ppv === 2){
+      var right = await renderPdfPageFaceAt(pageIndex, 'right');
+      if (right.node.firstChild){
+        var rightImg = right.node.firstChild.cloneNode(true);
+        rightImg.style.boxShadow = '0 6px 22px rgba(34,30,24,0.18)';
+        outer.appendChild(rightImg);
+      }
+    }
+    return { node: outer, rect: null };
+  }
+
+  function capturePdfFrontFace(){
+    var pages = document.getElementById('pdf-pages');
+    var wrap = document.createElement('div');
+    wrap.style.position = 'absolute';
+    wrap.style.inset = '0';
+    wrap.style.display = 'flex';
+    wrap.style.alignItems = 'center';
+    wrap.style.justifyContent = 'center';
+    wrap.style.gap = '18px';
+    Array.prototype.forEach.call(pages.querySelectorAll('canvas'), function(c){
+      var img = document.createElement('img');
+      img.src = c.toDataURL();
+      img.style.width = c.width + 'px';
+      img.style.height = c.height + 'px';
+      img.style.maxWidth = 'none';
+      img.style.boxShadow = '0 6px 22px rgba(34,30,24,0.18)';
+      wrap.appendChild(img);
+    });
+    return wrap;
+  }
+
+  function supports3DTransforms(){
+    try{
+      return !!(window.CSS && CSS.supports && CSS.supports('transform-style', 'preserve-3d') && CSS.supports('perspective', '1000px'));
+    }catch(e){ return false; }
+  }
+
+  function choosePageMotion(){
+    if (reducedMotion()) return 'none';
+    var lowPower = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+    var compactOrTouch = window.matchMedia && window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+    if (supports3DTransforms() && !lowPower && !compactOrTouch) return 'flip3d';
+    if (window.CSS && CSS.supports && CSS.supports('transform', 'translateX(1px)')) return 'slide';
+    return 'none';
+  }
+
+  function runPageAnimation(direction, frontNode, backNode, onSettled, options){
+    options = options || {};
+    var motion = choosePageMotion();
+    var host = document.getElementById('reader-body');
+    if (motion === 'none'){
+      var settled = onSettled ? onSettled() : null;
+      Promise.resolve(settled).finally(function(){ isFlipping = false; });
+      return;
+    }
+    isFlipping = true;
+    host.classList.add('page-animating');
+
+    var cleanupNodes = [];
+    function addOverlayNode(node, rect, zIndex){
+      if (!node) return null;
+      var shell = document.createElement('div');
+      shell.className = 'preturn-hold';
+      shell.style.zIndex = String(zIndex || 5);
+      applyAnimationRect(shell, rect || null);
+      shell.appendChild(node);
+      host.appendChild(shell);
+      cleanupNodes.push(shell);
+      return shell;
+    }
+
+    // If the real reader is updated while the page is turning, keep a snapshot
+    // of the old spread underneath the animated leaf. This preserves the book
+    // illusion while still allowing the next page to preload behind the clip.
+    addOverlayNode(options.holdNode || null, options.holdRect || null, 4);
+    addOverlayNode(options.backgroundNode || null, options.backgroundRect || options.rect || null, 5);
+
+    if (options.onCue){
+      try{ options.onCue(); }
+      catch(err){ console.error(err); }
+    }
+
+    var done = false;
+    var halfTimer = null;
+    var updateTimer = null;
+    var startPromise = null;
+    function beginUnderlyingUpdate(){
+      if (startPromise) return startPromise;
+      if (updateTimer){ clearTimeout(updateTimer); updateTimer = null; }
+      if (options.onStart){
+        try{ startPromise = Promise.resolve(options.onStart()); }
+        catch(err){ console.error(err); startPromise = Promise.resolve(); }
+      } else {
+        startPromise = Promise.resolve();
+      }
+      return startPromise;
+    }
+    function scheduleUnderlyingUpdate(){
+      var delay = Math.max(0, Number(options.updateDelay) || 0);
+      if (delay){ updateTimer = setTimeout(beginUnderlyingUpdate, delay); }
+      else beginUnderlyingUpdate();
+    }
+    function finish(node){
+      if (done) return;
+      done = true;
+      if (halfTimer){ clearTimeout(halfTimer); halfTimer = null; }
+      var loadPromise = beginUnderlyingUpdate();
+      var settled;
+      try{ settled = onSettled ? onSettled() : null; }
+      catch(err){ console.error(err); }
+      Promise.all([loadPromise, Promise.resolve(settled)]).catch(function(err){ console.error(err); }).finally(function(){
+        if (node && node.remove) node.remove();
+        cleanupNodes.forEach(function(n){ if (n && n.remove) n.remove(); });
+        host.classList.remove('page-animating');
+        isFlipping = false;
+      });
+    }
+
+    if (motion === 'slide'){
+      var stage = document.createElement('div');
+      stage.className = 'slide-stage dir-' + direction;
+      applyAnimationRect(stage, options.rect);
+      var current = document.createElement('div');
+      current.className = 'slide-panel slide-current';
+      current.appendChild(frontNode);
+      var next = document.createElement('div');
+      next.className = 'slide-panel slide-next';
+      next.appendChild(backNode || document.createElement('div'));
+      stage.appendChild(current);
+      stage.appendChild(next);
+      host.appendChild(stage);
+      scheduleUnderlyingUpdate();
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ stage.classList.add('animate'); }); });
+      stage.addEventListener('transitionend', function(e){ if (e.target === next) finish(stage); });
+      setTimeout(function(){ finish(stage); }, 720);
+      return;
+    }
+
+    var leaf = document.createElement('div');
+    leaf.className = 'flip-leaf motion-flip3d dir-' + direction;
+    applyAnimationRect(leaf, options.rect);
+    leaf.style.transformOrigin = direction === 'next' ? 'left center' : 'right center';
+
+    var front = document.createElement('div');
+    front.className = 'flip-face flip-front';
+    front.appendChild(frontNode);
+
+    var back = document.createElement('div');
+    back.className = 'flip-face flip-back';
+    back.appendChild(backNode || document.createElement('div'));
+
+    leaf.appendChild(front);
+    leaf.appendChild(back);
+    host.appendChild(leaf);
+    scheduleUnderlyingUpdate();
+
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        leaf.style.transform = 'rotateY(' + (direction === 'next' ? '-180deg' : '180deg') + ')';
+        halfTimer = setTimeout(function(){ leaf.classList.add('past-half'); }, 250);
+      });
+    });
+    leaf.addEventListener('transitionend', function(e){ if (e.target === leaf) finish(leaf); });
+    setTimeout(function(){ finish(leaf); }, 760);
+  }
+
+
+  // ---------------- storage helpers ----------------
+  var idbPromise = null;
+  function openIdb(){
+    if (!('indexedDB' in window)) return Promise.resolve(null);
+    if (idbPromise) return idbPromise;
+    idbPromise = new Promise(function(resolve){
+      var req;
+      try{ req = indexedDB.open('foxed-reader-store', 1); }
+      catch(e){ resolve(null); return; }
+      req.onupgradeneeded = function(){
+        var db = req.result;
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+      };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ resolve(null); };
+      req.onblocked = function(){ resolve(null); };
+    });
+    return idbPromise;
+  }
+  async function idbGet(key){
+    var db = await openIdb();
+    if (!db) return null;
+    return new Promise(function(resolve){
+      var tx = db.transaction('kv', 'readonly');
+      var req = tx.objectStore('kv').get(key);
+      req.onsuccess = function(){ resolve(req.result == null ? null : {value: req.result}); };
+      req.onerror = function(){ resolve(null); };
+    });
+  }
+  async function idbSet(key, value){
+    var db = await openIdb();
+    if (!db) throw new Error('IndexedDB unavailable');
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction('kv', 'readwrite');
+      tx.oncomplete = resolve;
+      tx.onerror = function(){ reject(tx.error || new Error('IndexedDB write failed')); };
+      tx.objectStore('kv').put(value, key);
+    });
+  }
+  async function idbDelete(key){
+    var db = await openIdb();
+    if (!db) return;
+    return new Promise(function(resolve){
+      var tx = db.transaction('kv', 'readwrite');
+      tx.oncomplete = resolve;
+      tx.onerror = resolve;
+      tx.objectStore('kv').delete(key);
+    });
+  }
+  async function storageGet(key){
+    if (window.storage && window.storage.get) return window.storage.get(key, false);
+    var fromIdb = await idbGet(key);
+    if (fromIdb) return fromIdb;
+    var value = null;
+    try{ value = localStorage.getItem(key); }catch(e){}
+    return value == null ? null : {value: value};
+  }
+  async function storageSet(key, value){
+    if (window.storage && window.storage.set) return window.storage.set(key, value, false);
+    try{ await idbSet(key, value); return; }
+    catch(e){ localStorage.setItem(key, value); }
+  }
+  async function storageDelete(key){
+    if (window.storage && window.storage.delete) return window.storage.delete(key, false);
+    try{ await idbDelete(key); }catch(e){}
+    try{ localStorage.removeItem(key); }catch(e){}
+  }
+
+  async function loadLibraryIndex(){
+    try{
+      var res = await storageGet('library-index');
+      library = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){ library = []; }
+  }
+  async function saveLibraryIndex(){
+    try{ await storageSet('library-index', JSON.stringify(library)); }
+    catch(e){ console.error('Could not save library index', e); }
+  }
+  async function loadSettings(){
+    try{
+      var res = await storageGet('reader-settings');
+      if (res && res.value){
+        var s = JSON.parse(res.value);
+        if (s.pagesPerView === 1 || s.pagesPerView === 2) pagesPerView = s.pagesPerView;
+        if (s.readerPrefs){
+          readerPrefs.fontScale = clampNumber(Number(s.readerPrefs.fontScale) || 1, 0.75, 1.6);
+          readerPrefs.lineScale = clampNumber(Number(s.readerPrefs.lineScale) || 1, 0.85, 1.35);
+          readerPrefs.marginScale = clampNumber(Number(s.readerPrefs.marginScale) || 1, 0.65, 1.45);
+          readerPrefs.theme = THEMES.indexOf(s.readerPrefs.theme) > -1 ? s.readerPrefs.theme : 'light';
+        }
+      }
+    }catch(e){}
+    applyReaderSettings();
+  }
+  async function saveSettings(){
+    try{ await storageSet('reader-settings', JSON.stringify({pagesPerView: pagesPerView, readerPrefs: readerPrefs})); }catch(e){}
+  }
+  async function saveBookContent(id, payload){
+    try{ await storageSet('book-content:' + id, JSON.stringify(payload)); return true; }
+    catch(e){ console.error('Could not save book content', e); return false; }
+  }
+  async function loadBookContent(id){
+    try{
+      var res = await storageGet('book-content:' + id);
+      return res && res.value ? JSON.parse(res.value) : null;
+    }catch(e){ return null; }
+  }
+  async function deleteBookContent(id){ try{ await storageDelete('book-content:' + id); }catch(e){} }
+
+  // ---------------- html helpers ----------------
+  function textToHtml(text){
+    var paragraphs = text.split(/\n{2,}/).map(function(p){return p.trim();}).filter(Boolean);
+    if (paragraphs.length === 0) paragraphs = [text];
+    return '<section class="chapter" data-chapter="1">' + paragraphs.map(function(p){
+      return '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>';
+    }).join('') + '</section>';
+  }
+
+  function resolvePath(dir, relative){
+    try{
+      var u = new URL(relative, 'file:///' + dir);
+      return decodeURIComponent(u.pathname.replace(/^\//, ''));
+    }catch(e){ return dir + relative; }
+  }
+
+  function mimeForPath(path){
+    var ext = path.toLowerCase().split('.').pop();
+    if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+    if (ext === 'png') return 'image/png';
+    if (ext === 'gif') return 'image/gif';
+    if (ext === 'svg') return null;
+    if (ext === 'webp') return 'image/webp';
+    return 'image/jpeg';
+  }
+
+  async function inlineChapterImages(doc, zip, chapterDir){
+    var imgs = doc.querySelectorAll('img');
+    for (var i=0; i<imgs.length; i++){
+      var img = imgs[i];
+      var src = img.getAttribute('src');
+      if (!src || src.indexOf('data:') === 0) continue;
+      var full = resolvePath(chapterDir, src);
+      var file = zip.file(full) || zip.file(full.replace(/^\//, ''));
+      var mime = mimeForPath(full);
+      if (!file || !mime){ img.remove(); continue; }
+      try{
+        var b64 = await file.async('base64');
+        img.setAttribute('src', 'data:' + mime + ';base64,' + b64);
+      }catch(e){ img.remove(); }
+    }
+  }
+
+  function sanitizeChapterDoc(doc){
+    var dangerous = 'script, style, link, head, title, iframe, object, embed, svg, math, form, input, button, select, textarea, video, audio, canvas, meta, base';
+    doc.querySelectorAll(dangerous).forEach(function(el){ el.remove(); });
+
+    doc.querySelectorAll('a').forEach(function(a){
+      var frag = doc.createDocumentFragment();
+      while (a.firstChild) frag.appendChild(a.firstChild);
+      a.parentNode.replaceChild(frag, a);
+    });
+
+    var allowed = {
+      section: true, p: true, br: true, h1: true, h2: true, h3: true, h4: true,
+      blockquote: true, em: true, strong: true, i: true, b: true, u: true,
+      ul: true, ol: true, li: true, span: true, img: true, table: true,
+      thead: true, tbody: true, tr: true, td: true, th: true, hr: true, pre: true, code: true
+    };
+    Array.prototype.slice.call(doc.body ? doc.body.querySelectorAll('*') : []).forEach(function(el){
+      var tag = el.tagName.toLowerCase();
+      if (!allowed[tag]){
+        var frag = doc.createDocumentFragment();
+        while (el.firstChild) frag.appendChild(el.firstChild);
+        el.parentNode.replaceChild(frag, el);
+        return;
+      }
+      Array.prototype.slice.call(el.attributes).forEach(function(attr){
+        var name = attr.name.toLowerCase();
+        var value = attr.value || '';
+        var keep = false;
+        if (tag === 'img' && (name === 'src' || name === 'alt' || name === 'title' || name === 'width' || name === 'height')) keep = true;
+        if (tag === 'section' && name === 'data-chapter') keep = true;
+        if (name === 'class' && /^(chapter|chapter\s+)*$/.test(value.trim())) keep = true;
+        if ((tag === 'td' || tag === 'th') && (name === 'colspan' || name === 'rowspan')) keep = true;
+        if (name.indexOf('on') === 0 || name === 'style' || name === 'srcdoc' || name === 'href' || name === 'formaction') keep = false;
+        if (name === 'src' && tag === 'img'){
+          var trimmed = value.trim().toLowerCase();
+          if (trimmed.indexOf('javascript:') === 0 || trimmed.indexOf('data:text/html') === 0) keep = false;
+        }
+        if (!keep) el.removeAttribute(attr.name);
+      });
+    });
+  }
+
+  function removeUnsafeImages(doc){
+    doc.querySelectorAll('img').forEach(function(img){
+      var src = (img.getAttribute('src') || '').trim();
+      if (!/^data:image\/(png|jpeg|jpg|gif|webp);base64,/i.test(src)) img.remove();
+    });
+  }
+
+  // ---------------- format parsers ----------------
+  function parseTxtContent(text, filenameGuess){
+    var title = (filenameGuess || 'Untitled').replace(/\.[^/.]+$/, '');
+    return {title: title, author: 'Unknown author', contentType: 'reflow', html: textToHtml(text), format: 'txt'};
+  }
+
+  async function parsePdfBuffer(arrayBuffer){
+    await ensurePdfJs();
+    var pdf = await pdfjsLib.getDocument({data: arrayBuffer.slice(0), isEvalSupported: false, stopAtErrors: true}).promise;
+    var meta = null;
+    try{ meta = await pdf.getMetadata(); }catch(e){}
+    var title = (meta && meta.info && meta.info.Title) ? meta.info.Title : 'Untitled';
+    var author = (meta && meta.info && meta.info.Author) ? meta.info.Author : 'Unknown author';
+    return {title: title, author: author, contentType: 'paged', numPages: pdf.numPages, format: 'pdf', _arrayBuffer: arrayBuffer, _pdfDoc: pdf};
+  }
+
+  async function parseEpubBuffer(arrayBuffer){
+    var zip = await JSZip.loadAsync(arrayBuffer);
+    var containerFile = zip.file('META-INF/container.xml');
+    if (!containerFile) throw new Error('Not a valid EPUB (missing container.xml).');
+    var containerXml = await containerFile.async('string');
+    var containerDoc = new DOMParser().parseFromString(containerXml, 'application/xml');
+    var rootfileEl = containerDoc.querySelector('rootfile');
+    var opfPath = rootfileEl.getAttribute('full-path');
+    var opfDir = opfPath.indexOf('/') > -1 ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1) : '';
+    var opfFile = zip.file(opfPath);
+    var opfXml = await opfFile.async('string');
+    var opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml');
+
+    var titleEl = opfDoc.getElementsByTagName('dc:title')[0];
+    var authorEl = opfDoc.getElementsByTagName('dc:creator')[0];
+    var title = titleEl ? titleEl.textContent.trim() : 'Untitled';
+    var author = authorEl ? authorEl.textContent.trim() : 'Unknown author';
+
+    var manifestItems = {};
+    opfDoc.querySelectorAll('manifest > item').forEach(function(item){
+      manifestItems[item.getAttribute('id')] = item.getAttribute('href');
+    });
+    var spineIds = Array.prototype.map.call(opfDoc.querySelectorAll('spine > itemref'), function(el){
+      return el.getAttribute('idref');
+    });
+
+    var chapterParts = [];
+    var chapterCounter = 0;
+    for (var c=0; c<spineIds.length; c++){
+      var href = manifestItems[spineIds[c]];
+      if (!href) continue;
+      var fullPath = resolvePath(opfDir, href);
+      var file = zip.file(fullPath) || zip.file(fullPath.replace(/^\//, ''));
+      if (!file) continue;
+      var chapterHtml = await file.async('string');
+      var chapterDoc = new DOMParser().parseFromString(chapterHtml, 'text/html');
+      sanitizeChapterDoc(chapterDoc);
+      var chapterDir = fullPath.indexOf('/') > -1 ? fullPath.slice(0, fullPath.lastIndexOf('/') + 1) : '';
+      await inlineChapterImages(chapterDoc, zip, chapterDir);
+      sanitizeChapterDoc(chapterDoc);
+      removeUnsafeImages(chapterDoc);
+      var bodyHtml = chapterDoc.body ? chapterDoc.body.innerHTML.trim() : '';
+      var textCheck = chapterDoc.body ? chapterDoc.body.textContent.trim() : '';
+      if (!bodyHtml || textCheck.length < 2) continue;
+      chapterCounter++;
+      chapterParts.push('<section class="chapter" data-chapter="' + chapterCounter + '">' + bodyHtml + '</section>');
+    }
+    if (chapterParts.length === 0) throw new Error('Could not find readable text inside this EPUB.');
+    return {title: title, author: author, contentType: 'reflow', html: chapterParts.join('\n'), format: 'epub'};
+  }
+
+  function normalizeBookUrl(url){
+    var parsed;
+    try{ parsed = new URL(url, window.location.href); }
+    catch(e){ throw new Error('That is not a valid URL.'); }
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:'){
+      throw new Error('Only http and https book links are supported.');
+    }
+    return parsed.href;
+  }
+
+  function assertResponseSize(resp){
+    var len = Number(resp.headers.get('content-length') || 0);
+    if (len && len > MAX_LINK_BYTES){
+      throw new Error('That file is too large for the browser reader. Please use a file under 60 MB.');
+    }
+  }
+
+  async function fetchFromLink(url){
+    url = normalizeBookUrl(url);
+    var resp = await fetch(url);
+    if (!resp.ok) throw new Error('The link responded with an error (status ' + resp.status + ').');
+    assertResponseSize(resp);
+    var ctype = (resp.headers.get('content-type') || '').toLowerCase();
+    var lowerUrl = url.toLowerCase().split('?')[0];
+
+    if (lowerUrl.endsWith('.epub') || ctype.indexOf('epub') > -1){
+      var buf1 = await resp.arrayBuffer();
+      var result1 = await parseEpubBuffer(buf1);
+      result1.source = url;
+      return result1;
+    }
+    if (lowerUrl.endsWith('.pdf') || ctype.indexOf('pdf') > -1){
+      var buf2 = await resp.arrayBuffer();
+      var result2 = await parsePdfBuffer(buf2);
+      result2.source = url;
+      return result2;
+    }
+    if (lowerUrl.endsWith('.txt') || ctype.indexOf('text/plain') > -1){
+      var text = await resp.text();
+      var filename = decodeURIComponent(url.split('/').pop() || 'Untitled');
+      var result3 = parseTxtContent(text, filename);
+      result3.source = url;
+      return result3;
+    }
+    var html = await resp.text();
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var pageTitle = doc.querySelector('title') ? doc.querySelector('title').textContent.trim() : 'Untitled';
+    sanitizeChapterDoc(doc);
+    removeUnsafeImages(doc);
+    var bodyHtml = doc.body ? doc.body.innerHTML.trim() : '';
+    var textCheck = doc.body ? doc.body.textContent.trim() : '';
+    if (!bodyHtml || textCheck.length < 40) throw new Error('This link did not contain readable book text.');
+    return {title: pageTitle, author: 'From the web', contentType: 'reflow', html: '<section class="chapter" data-chapter="1">' + bodyHtml + '</section>', format: 'html', source: url};
+  }
+
+  // ---------------- progress helpers ----------------
+  function bookProgressPercent(meta){
+    if (meta.contentType === 'paged'){
+      return meta.totalPages > 1 ? Math.round((meta.pdfPageIndex / (meta.totalPages - 1)) * 100) : 100;
+    }
+    return Math.round((meta.progressFraction || 0) * 100);
+  }
+  function bookProgressLabel(meta){
+    if (meta.contentType === 'paged') return 'page ' + (meta.pdfPageIndex + 1) + ' of ' + meta.totalPages;
+    return bookProgressPercent(meta) + '% read';
+  }
+
+  // ---------------- hold-to-manage book popover ----------------
+  var holdTimer = null;
+  var holdPointerId = null;
+  var holdTriggered = false;
+  var pendingPopoverId = null;
+
+  function clearHoldState(el){
+    if (holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
+    holdPointerId = null;
+    if (el) el.classList.remove('holding');
+  }
+
+  function showBookPopover(id, x, y){
+    var meta = library.find(function(b){ return b.id === id; });
+    if (!meta) return;
+    pendingPopoverId = id;
+    var pop = document.getElementById('book-popover');
+    document.getElementById('book-popover-title').textContent = meta.title;
+    pop.classList.add('show');
+    pop.setAttribute('aria-hidden', 'false');
+
+    var pad = 12;
+    var left = Math.max(pad, Math.min(x || 20, window.innerWidth - pop.offsetWidth - pad));
+    var top = Math.max(pad, Math.min((y || 20) + 12, window.innerHeight - pop.offsetHeight - pad));
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+    var del = document.getElementById('popover-delete-btn');
+    if (del){
+      try{ del.focus({preventScroll:true}); }catch(e){ del.focus(); }
+    }
+  }
+
+  function closeBookPopover(){
+    var pop = document.getElementById('book-popover');
+    if (!pop) return;
+    pop.classList.remove('show');
+    pop.setAttribute('aria-hidden', 'true');
+    pendingPopoverId = null;
+  }
+
+  function bindBookHold(el, id){
+    el.addEventListener('pointerdown', function(e){
+      if (e.button != null && e.button !== 0) return;
+      closeBookPopover();
+      holdTriggered = false;
+      holdPointerId = e.pointerId;
+      var startX = e.clientX, startY = e.clientY;
+      holdTimer = setTimeout(function(){
+        holdTriggered = true;
+        el.classList.add('holding');
+        showBookPopover(id, startX, startY);
+        try{ if (navigator.vibrate) navigator.vibrate(12); }catch(err){}
+      }, 650);
+    });
+    el.addEventListener('pointermove', function(e){
+      if (e.pointerId !== holdPointerId) return;
+      if (Math.abs(e.movementX) + Math.abs(e.movementY) > 10) clearHoldState(el);
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(type){
+      el.addEventListener(type, function(){ clearHoldState(el); });
+    });
+    el.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      holdTriggered = true;
+      showBookPopover(id, e.clientX, e.clientY);
+    });
+  }
+
+  // ---------------- rendering: shelf / landing ----------------
+  function renderShelf(){
+    var wrap = document.getElementById('shelf-wrap');
+    if (library.length === 0){
+      wrap.innerHTML = '<div id="shelf-empty">Nothing on the shelf yet.<br>Open a new book to get started.</div>';
+      return;
+    }
+    var sorted = library.slice().sort(function(a,b){ return b.lastOpenedAt - a.lastOpenedAt; });
+    var html = '<div class="shelf-row">';
+    sorted.forEach(function(b){
+      var pct = bookProgressPercent(b);
+      html += '<div class="spine' + (b.id === currentBookId ? ' active' : '') + '" style="background:' + b.spineColor + '" data-id="' + b.id + '" tabindex="0" role="button" aria-label="Open ' + escapeHtml(b.title) + '. Hold for delete options." title="' + escapeHtml(b.title) + ' — hold to delete">' +
+                '<span class="spine-title">' + escapeHtml(b.title) + '</span>' +
+                '<div class="spine-progress"><i style="width:' + pct + '%"></i></div>' +
+              '</div>';
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.spine').forEach(function(el){
+      var id = el.getAttribute('data-id');
+      bindBookHold(el, id);
+      el.addEventListener('click', function(){
+        if (holdTriggered){ holdTriggered = false; return; }
+        openBook(id);
+      });
+      el.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openBook(id); }
+        if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); showBookPopover(id, el.getBoundingClientRect().right, el.getBoundingClientRect().top); }
+      });
+    });
+  }
+
+  function renderContinueGrid(){
+    var section = document.getElementById('continue-section');
+    var grid = document.getElementById('continue-grid');
+    if (library.length === 0){ section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    var sorted = library.slice().sort(function(a,b){ return b.lastOpenedAt - a.lastOpenedAt; }).slice(0, 6);
+    grid.innerHTML = sorted.map(function(b){
+      var pct = bookProgressPercent(b);
+      return '<div class="book-card" data-id="' + b.id + '" tabindex="0" role="button" aria-label="Open ' + escapeHtml(b.title) + '. Hold for delete options.">' +
+        '<div class="book-card-spine" style="background:' + b.spineColor + '"></div>' +
+        '<div style="flex:1; min-width:0;">' +
+          '<p class="book-card-title">' + escapeHtml(b.title) + '</p>' +
+          '<div class="book-card-meta">' + escapeHtml(b.author) + ' · ' + bookProgressLabel(b) + '</div>' +
+          '<div class="book-card-progress"><i style="width:' + pct + '%"></i></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    grid.querySelectorAll('.book-card').forEach(function(el){
+      var id = el.getAttribute('data-id');
+      bindBookHold(el, id);
+      el.addEventListener('click', function(){
+        if (holdTriggered){ holdTriggered = false; return; }
+        openBook(id);
+      });
+      el.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openBook(id); }
+        if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); showBookPopover(id, el.getBoundingClientRect().right, el.getBoundingClientRect().top); }
+      });
+    });
+  }
+
+  function showView(name){
+    document.body.classList.toggle('reader-open', name === 'reader');
+    closeBookPopover();
+    closeSettingsPanel();
+    if (name !== 'reader') closeSearchPanel();
+    document.getElementById('landing-view').style.display = name === 'landing' ? 'block' : 'none';
+    document.getElementById('loading-view').style.display = name === 'loading' ? 'flex' : 'none';
+    document.getElementById('reader-view').style.display = name === 'reader' ? 'flex' : 'none';
+  }
+  function setLoading(msg){ document.getElementById('loading-msg').textContent = msg; showView('loading'); }
+  function showError(msg){ var el = document.getElementById('error-banner'); el.textContent = msg; el.classList.remove('notice'); el.classList.add('show'); }
+  function showNotice(msg){ var el = document.getElementById('error-banner'); el.textContent = msg; el.classList.add('notice'); el.classList.add('show'); }
+  function clearError(){ var el = document.getElementById('error-banner'); el.classList.remove('show'); el.classList.remove('notice'); }
+  function showTurnPrep(msg){ var el = document.getElementById('turn-prep'); if (!el) return; el.textContent = msg || 'Preparing page…'; el.classList.add('show'); }
+  function hideTurnPrep(){ var el = document.getElementById('turn-prep'); if (el) el.classList.remove('show'); }
+
+  function currentMeta(){ return library.find(function(b){ return b.id === currentBookId; }); }
+
+  // ---------------- mode toggle ----------------
+  function effectivePagesPerView(){
+    var body = document.getElementById('reader-body');
+    var w = body && body.clientWidth ? body.clientWidth : window.innerWidth;
+    return (pagesPerView === 2 && w >= 720) ? 2 : 1;
+  }
+
+  function updateModeButtons(){
+    document.getElementById('mode-1').classList.toggle('active', pagesPerView === 1);
+    document.getElementById('mode-2').classList.toggle('active', pagesPerView === 2);
+  }
+  async function setPagesPerView(n){
+    if (pagesPerView === n) return;
+    pagesPerView = n;
+    updateModeButtons();
+    saveSettings();
+    resetZoom();
+    var meta = currentMeta();
+    if (!meta) return;
+    if (meta.contentType === 'reflow'){
+      var fraction = reflowState.totalScreens > 1 ? reflowState.pageIndex / (reflowState.totalScreens - 1) : 0;
+      layoutReflow(fraction);
+    } else if (meta.contentType === 'paged'){
+      var ppv = effectivePagesPerView();
+      pdfState.pageIndex = pdfState.pageIndex - (pdfState.pageIndex % ppv);
+      renderPdfPages();
+    }
+  }
+
+  // ---------------- reflow pagination ----------------
+  function reflowInnerSize(viewport){
+    var cs = getComputedStyle(viewport);
+    var padL = parseFloat(cs.paddingLeft) || 0;
+    var padR = parseFloat(cs.paddingRight) || 0;
+    var padT = parseFloat(cs.paddingTop) || 0;
+    var padB = parseFloat(cs.paddingBottom) || 0;
+    return { w: viewport.clientWidth - padL - padR, h: viewport.clientHeight - padT - padB };
+  }
+
+  function layoutReflow(restoreFraction){
+    var viewport = document.getElementById('reflow-viewport');
+    var content = document.getElementById('reflow-content');
+    var spread = effectivePagesPerView() === 2;
+    viewport.classList.toggle('spread', spread);
+    var size = reflowInnerSize(viewport);
+    var vw = Math.max(1, size.w);
+    var vh = Math.max(1, size.h);
+    var gap = spread ? 56 : 0;
+    var colWidth = spread ? Math.max(220, Math.floor((vw - gap) / 2)) : vw;
+    content.style.transform = 'translateX(0px)';
+    content.style.columnWidth = colWidth + 'px';
+    content.style.columnGap = gap + 'px';
+    content.style.height = vh + 'px';
+    content.style.width = vw + 'px';
+    var totalContentWidth = content.scrollWidth;
+    reflowState.totalScreens = Math.max(1, Math.ceil(totalContentWidth / vw));
+    if (restoreFraction != null){
+      reflowState.pageIndex = Math.round(restoreFraction * (reflowState.totalScreens - 1));
+    } else {
+      reflowState.pageIndex = Math.min(reflowState.pageIndex, reflowState.totalScreens - 1);
+    }
+    if (reflowState.pageIndex < 0 || isNaN(reflowState.pageIndex)) reflowState.pageIndex = 0;
+    applyReflowTransform();
+  }
+
+  function relayoutReflowPreservingProgress(){
+    var meta = currentMeta();
+    if (!meta || meta.contentType !== 'reflow') return;
+    if (document.getElementById('reader-view').style.display !== 'flex') return;
+    var fraction = reflowState.totalScreens > 1 ? reflowState.pageIndex / (reflowState.totalScreens - 1) : 0;
+    layoutReflow(fraction);
+  }
+
+  function applyReflowTransform(){
+    var viewport = document.getElementById('reflow-viewport');
+    var content = document.getElementById('reflow-content');
+    var vw = reflowInnerSize(viewport).w;
+    content.style.transform = 'translateX(-' + (reflowState.pageIndex * vw) + 'px)';
+    updateChapterLabel();
+    updateReaderChrome();
+    updateReflowZoomCorners();
+  }
+
+  function updateChapterLabel(){
+    var label = document.getElementById('chapter-label');
+    var viewport = document.getElementById('reflow-viewport');
+    var sections = document.querySelectorAll('#reflow-content .chapter');
+    if (sections.length <= 1){ label.style.display = 'none'; return; }
+    var vRect = viewport.getBoundingClientRect();
+    var found = null;
+    for (var i=0; i<sections.length; i++){
+      var r = sections[i].getBoundingClientRect();
+      if (r.right > vRect.left + 1 && r.left < vRect.right - 1){ found = sections[i]; break; }
+    }
+    if (found){
+      label.textContent = 'Section ' + found.getAttribute('data-chapter');
+      label.style.display = 'block';
+    } else {
+      label.style.display = 'none';
+    }
+  }
+
+  async function saveReflowProgress(){
+    var meta = currentMeta();
+    if (!meta) return;
+    meta.progressFraction = reflowState.totalScreens > 1 ? reflowState.pageIndex / (reflowState.totalScreens - 1) : 0;
+    await saveLibraryIndex();
+  }
+
+  // ---------------- pdf pagination ----------------
+  async function renderPdfPages(){
+    if (!pdfState.doc || pdfState.rendering) return;
+    pdfState.rendering = true;
+    try{
+      var container = document.getElementById('pdf-pages');
+      var ppv = effectivePagesPerView();
+      container.className = ppv === 2 ? 'spread' : '';
+      container.innerHTML = '';
+      var viewportEl = document.getElementById('pdf-viewport');
+      var nums = ppv === 2 ? [pdfState.pageIndex + 1, pdfState.pageIndex + 2] : [pdfState.pageIndex + 1];
+      for (var i=0; i<nums.length; i++){
+        var num = nums[i];
+        if (num < 1 || num > pdfState.doc.numPages) continue;
+        var page = await pdfState.doc.getPage(num);
+        var baseViewport = page.getViewport({scale: 1});
+        var availH = Math.max(120, viewportEl.clientHeight - 48);
+        var availW = ppv === 2 ? Math.max(120, (viewportEl.clientWidth - 18 - 48) / 2) : Math.max(120, viewportEl.clientWidth - 48);
+        var scale = Math.min(availH / baseViewport.height, availW / baseViewport.width);
+        var scaledViewport = page.getViewport({scale: scale});
+        var canvas = document.createElement('canvas');
+        canvas.className = 'pdf-page-canvas';
+        canvas.width = Math.floor(scaledViewport.width);
+        canvas.height = Math.floor(scaledViewport.height);
+        var ctx = canvas.getContext('2d');
+        await page.render({canvasContext: ctx, viewport: scaledViewport}).promise;
+        container.appendChild(buildPdfPageUnit(canvas, num));
+      }
+      updateReaderChrome();
+    }catch(err){
+      console.error('Could not render PDF page', err);
+      showError('Could not render this PDF page. Try going back or reopening the book.');
+    }finally{
+      pdfState.rendering = false;
+    }
+  }
+
+  async function savePdfProgress(){
+    var meta = currentMeta();
+    if (!meta) return;
+    meta.pdfPageIndex = pdfState.pageIndex;
+    await saveLibraryIndex();
+  }
+
+  // ---------------- shared chrome ----------------
+  function updateReaderChrome(){
+    var meta = currentMeta();
+    if (!meta) return;
+    if (meta.contentType === 'reflow'){
+      document.getElementById('reader-pagecount').textContent = (reflowState.pageIndex+1) + ' / ' + reflowState.totalScreens;
+      document.getElementById('page-jump').textContent = (reflowState.totalScreens > 1 ? Math.round((reflowState.pageIndex/(reflowState.totalScreens-1))*100) : 100) + '% read';
+      document.getElementById('prev-btn').disabled = reflowState.pageIndex <= 0;
+      document.getElementById('next-btn').disabled = reflowState.pageIndex >= reflowState.totalScreens - 1;
+    } else {
+      var ppv = effectivePagesPerView();
+      var lastShown = Math.min(pdfState.pageIndex + ppv, meta.totalPages);
+      document.getElementById('reader-pagecount').textContent = (pdfState.pageIndex+1) + (ppv===2 && lastShown>pdfState.pageIndex+1 ? '-'+lastShown : '') + ' / ' + meta.totalPages;
+      document.getElementById('page-jump').textContent = 'page ' + (pdfState.pageIndex + 1) + ' of ' + meta.totalPages;
+      document.getElementById('prev-btn').disabled = pdfState.pageIndex <= 0;
+      document.getElementById('next-btn').disabled = pdfState.pageIndex + ppv >= meta.totalPages;
+    }
+  }
+
+  function goNext(){
+    if (isFlipping) return;
+    var meta = currentMeta();
+    if (!meta) return;
+    if (zoomState.level > 1) resetZoom();
+    if (meta.contentType === 'reflow'){
+      if (reflowState.pageIndex >= reflowState.totalScreens - 1) return;
+      var oldIndex = reflowState.pageIndex;
+      var targetIndex = oldIndex + 1;
+      var spread = effectivePagesPerView() === 2;
+      var frontFace = spread ? captureReflowPageFace('right', oldIndex) : { node: captureReflowFrontFace(oldIndex), rect: null };
+      var backFace = spread ? captureReflowPageFace('left', targetIndex) : { node: captureReflowFrontFace(targetIndex), rect: null };
+      var bgFace = spread ? captureReflowPageFace('right', targetIndex) : { node: captureReflowFrontFace(targetIndex), rect: null };
+      var holdFace = spread ? captureReflowFrontFace(oldIndex) : null;
+      runPageAnimation('next', frontFace.node, backFace.node, null, {
+        rect: frontFace.rect,
+        holdNode: holdFace,
+        backgroundNode: bgFace.node,
+        backgroundRect: bgFace.rect,
+        updateDelay: 400,
+        onCue: function(){
+          reflowState.pageIndex = targetIndex;
+          updateReaderChrome();
+          renderShelf();
+        },
+        onStart: function(){
+          applyReflowTransform();
+          saveReflowProgress(); renderShelf();
+        }
+      });
+    } else {
+      var ppv = effectivePagesPerView();
+      if (pdfState.pageIndex + ppv >= meta.totalPages) return;
+      preparePdfTurn('next', pdfState.pageIndex + ppv, ppv);
+    }
+  }
+
+  function goPrev(){
+    if (isFlipping) return;
+    var meta = currentMeta();
+    if (!meta) return;
+    if (zoomState.level > 1) resetZoom();
+    if (meta.contentType === 'reflow'){
+      if (reflowState.pageIndex <= 0) return;
+      var oldIndex = reflowState.pageIndex;
+      var targetIndex = oldIndex - 1;
+      var spread = effectivePagesPerView() === 2;
+      var frontFace = spread ? captureReflowPageFace('left', oldIndex) : { node: captureReflowFrontFace(oldIndex), rect: null };
+      var backFace = spread ? captureReflowPageFace('right', targetIndex) : { node: captureReflowFrontFace(targetIndex), rect: null };
+      var bgFace = spread ? captureReflowPageFace('left', targetIndex) : { node: captureReflowFrontFace(targetIndex), rect: null };
+      var holdFace = spread ? captureReflowFrontFace(oldIndex) : null;
+      runPageAnimation('prev', frontFace.node, backFace.node, null, {
+        rect: frontFace.rect,
+        holdNode: holdFace,
+        backgroundNode: bgFace.node,
+        backgroundRect: bgFace.rect,
+        updateDelay: 400,
+        onCue: function(){
+          reflowState.pageIndex = targetIndex;
+          updateReaderChrome();
+          renderShelf();
+        },
+        onStart: function(){
+          applyReflowTransform();
+          saveReflowProgress(); renderShelf();
+        }
+      });
+    } else {
+      if (pdfState.pageIndex <= 0) return;
+      var ppv = effectivePagesPerView();
+      preparePdfTurn('prev', Math.max(0, pdfState.pageIndex - ppv), ppv);
+    }
+  }
+
+  async function preparePdfTurn(direction, targetIndex, ppv){
+    if (!pdfState.doc) return;
+    var oldIndex = pdfState.pageIndex;
+    var spread = ppv === 2;
+    var holdFace = spread ? capturePdfFrontFace() : null;
+    var prepTimer = setTimeout(function(){ showTurnPrep('Preparing page…'); }, 180);
+    isFlipping = true;
+    try{
+      var frontFace, backFace, bgFace;
+      if (spread){
+        if (direction === 'next'){
+          frontFace = capturePdfPageFace('right');
+          backFace = await renderPdfPageFaceAt(targetIndex, 'left');
+          bgFace = await renderPdfPageFaceAt(targetIndex, 'right');
+        } else {
+          frontFace = capturePdfPageFace('left');
+          backFace = await renderPdfPageFaceAt(targetIndex, 'right');
+          bgFace = await renderPdfPageFaceAt(targetIndex, 'left');
+        }
+      } else {
+        frontFace = { node: capturePdfFrontFace(), rect: null };
+        backFace = await renderPdfSpreadFaceAt(targetIndex);
+        bgFace = await renderPdfSpreadFaceAt(targetIndex);
+      }
+      clearTimeout(prepTimer);
+      hideTurnPrep();
+      runPageAnimation(direction, frontFace.node, backFace.node, null, {
+        rect: frontFace.rect,
+        holdNode: holdFace,
+        backgroundNode: bgFace.node,
+        backgroundRect: bgFace.rect,
+        updateDelay: 400,
+        onCue: function(){
+          pdfState.pageIndex = targetIndex;
+          var meta = currentMeta();
+          if (meta) meta.pdfPageIndex = targetIndex;
+          updateReaderChrome();
+          renderShelf();
+        },
+        onStart: function(){
+          return renderPdfPages().then(function(){ return savePdfProgress(); });
+        }
+      });
+    }catch(err){
+      clearTimeout(prepTimer);
+      hideTurnPrep();
+      console.error(err);
+      pdfState.pageIndex = oldIndex;
+      isFlipping = false;
+      showError('Could not prepare the next PDF page for animation.');
+    }
+  }
+
+  // ---------------- book lifecycle ----------------
+  // ---------------- duplicate detection ----------------
+  function normalizeBookField(s){ return (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' '); }
+  function findDuplicateBook(parsed){
+    var fp = parsed.fingerprint || null;
+    var source = parsed.source || null;
+    var title = normalizeBookField(parsed.title);
+    var author = normalizeBookField(parsed.author);
+    var format = parsed.format || '';
+    return library.find(function(b){
+      if (fp && b.fingerprint === fp) return true;
+      if (source && b.source === source) return true;
+      if (title && title !== 'untitled' && normalizeBookField(b.title) === title && normalizeBookField(b.author) === author && b.format === format) return true;
+      return false;
+    });
+  }
+
+  function sanitizeStoredHtml(html){
+    var doc = new DOMParser().parseFromString(html || '', 'text/html');
+    sanitizeChapterDoc(doc);
+    removeUnsafeImages(doc);
+    return doc.body ? doc.body.innerHTML : '';
+  }
+
+  async function addBook(parsed){
+    var duplicate = findDuplicateBook(parsed);
+    if (duplicate){
+      showNotice('Already on your shelf — opening the saved copy.');
+      await openBook(duplicate.id);
+      return;
+    }
+    var id = uid();
+    var meta = {
+      id: id,
+      title: parsed.title || 'Untitled',
+      author: parsed.author || 'Unknown author',
+      format: parsed.format || 'txt',
+      contentType: parsed.contentType,
+      source: parsed.source || null,
+      fingerprint: parsed.fingerprint || null,
+      addedAt: Date.now(),
+      lastOpenedAt: Date.now(),
+      spineColor: pickColor(parsed.title || id)
+    };
+    var savedOk = true;
+    if (parsed.contentType === 'reflow'){
+      meta.progressFraction = 0;
+      savedOk = await saveBookContent(id, {html: parsed.html});
+    } else {
+      meta.totalPages = parsed.numPages;
+      meta.pdfPageIndex = 0;
+      try{
+        savedOk = await saveBookContent(id, {pdfBase64: arrayBufferToBase64(parsed._arrayBuffer)});
+      }catch(e){ savedOk = false; }
+    }
+    library.unshift(meta);
+    await saveLibraryIndex();
+    if (!savedOk){
+      showError('This book was large enough that it couldn\u2019t be fully saved for later \u2014 you can still read it now, but it may not persist after a refresh.');
+    }
+    currentBookId = id;
+    if (parsed.contentType === 'reflow'){
+      openReflowReader(meta, parsed.html, 0);
+    } else {
+      pdfState.doc = parsed._pdfDoc;
+      pdfState.pageIndex = 0;
+      openPdfReader(meta);
+    }
+  }
+
+  async function openBook(id){
+    var meta = library.find(function(b){ return b.id === id; });
+    if (!meta) return;
+    setLoading('Pulling \u201c' + meta.title + '\u201d off the shelf\u2026');
+    var content = await loadBookContent(id);
+    if (!content){
+      showView('landing');
+      showError('Could not find the saved content for \u201c' + meta.title + '\u201d. It may need to be re-added.');
+      return;
+    }
+    meta.lastOpenedAt = Date.now();
+    await saveLibraryIndex();
+    currentBookId = id;
+    if (meta.contentType === 'reflow'){
+      openReflowReader(meta, content.html, meta.progressFraction || 0);
+    } else {
+      try{
+        await ensurePdfJs();
+        var buf = base64ToArrayBuffer(content.pdfBase64);
+        var pdf = await pdfjsLib.getDocument({data: buf, isEvalSupported: false, stopAtErrors: true}).promise;
+        pdfState.doc = pdf;
+        pdfState.pageIndex = meta.pdfPageIndex || 0;
+        openPdfReader(meta);
+      }catch(e){
+        showView('landing');
+        showError('Could not reopen this PDF. It may need to be re-added.');
+      }
+    }
+  }
+
+  function openReflowReader(meta, html, initialFraction){
+    document.getElementById('reader-title').textContent = meta.title;
+    document.getElementById('reader-author').textContent = meta.author;
+    document.getElementById('reflow-viewport').style.display = 'block';
+    document.getElementById('pdf-viewport').style.display = 'none';
+    document.getElementById('reflow-content').innerHTML = html;
+    updateModeButtons();
+    resetZoom();
+    showView('reader');
+    requestAnimationFrame(function(){
+      layoutReflow(initialFraction);
+      renderShelf();
+      if (document.fonts && document.fonts.ready){
+        document.fonts.ready.then(relayoutReflowPreservingProgress).catch(function(){});
+      }
+      document.querySelectorAll('#reflow-content img').forEach(function(img){
+        if (!img.complete){ img.addEventListener('load', relayoutReflowPreservingProgress, {once:true}); }
+      });
+    });
+  }
+
+  function openPdfReader(meta){
+    document.getElementById('reader-title').textContent = meta.title;
+    document.getElementById('reader-author').textContent = meta.author;
+    document.getElementById('reflow-viewport').style.display = 'none';
+    document.getElementById('pdf-viewport').style.display = 'flex';
+    document.getElementById('chapter-label').style.display = 'none';
+    updateModeButtons();
+    resetZoom();
+    showView('reader');
+    renderPdfPages();
+    renderShelf();
+  }
+
+  var pendingRemoveId = null;
+  function askRemoveBook(id){
+    var meta = library.find(function(b){ return b.id === id; });
+    if (!meta) return;
+    pendingRemoveId = id;
+    document.getElementById('confirm-modal-text').textContent = 'Remove \u201c' + meta.title + '\u201d from your shelf? This can\u2019t be undone.';
+    document.getElementById('confirm-modal').classList.add('show');
+  }
+  function closeConfirmModal(){
+    document.getElementById('confirm-modal').classList.remove('show');
+    pendingRemoveId = null;
+  }
+
+  async function removeBook(id){
+    closeBookPopover();
+    library = library.filter(function(b){ return b.id !== id; });
+    await saveLibraryIndex();
+    await deleteBookContent(id);
+    if (currentBookId === id){
+      currentBookId = null;
+      showView('landing');
+    }
+    renderShelf();
+    renderContinueGrid();
+  }
+
+  // ---------------- upload / link handling ----------------
+  async function handleFile(file){
+    clearError();
+    if (file.size > MAX_UPLOAD_BYTES){ showError('That file is too large for this browser reader. Please use a file under 60 MB.'); return; }
+    var ext = file.name.toLowerCase().split('.').pop();
+    setLoading('Opening \u201c' + file.name + '\u201d\u2026');
+    try{
+      var parsed;
+      if (ext === 'txt'){
+        var text = await file.text();
+        parsed = parseTxtContent(text, file.name);
+      } else if (ext === 'pdf'){
+        setLoading('Loading the PDF\u2026');
+        var buf = await file.arrayBuffer();
+        parsed = await parsePdfBuffer(buf);
+      } else if (ext === 'epub'){
+        setLoading('Unpacking the EPUB\u2026');
+        var buf2 = await file.arrayBuffer();
+        parsed = await parseEpubBuffer(buf2);
+      } else {
+        throw new Error('Unsupported file type. Please use .txt, .pdf, or .epub.');
+      }
+      if (!parsed.title || parsed.title === 'Untitled'){
+        parsed.title = file.name.replace(/\.[^/.]+$/, '');
+      }
+      parsed.fingerprint = ['file', file.name, file.size, file.lastModified || 0].join(':');
+      await addBook(parsed);
+    } catch(err){
+      console.error(err);
+      showView('landing');
+      showError('Could not open that file: ' + err.message);
+    }
+  }
+
+  async function handleLink(url){
+    clearError();
+    if (!url){ showError('Paste a link first.'); return; }
+    setLoading('Fetching the book from the link\u2026');
+    try{
+      var parsed = await fetchFromLink(url);
+      await addBook(parsed);
+    } catch(err){
+      console.error(err);
+      showView('landing');
+      showError('Could not fetch that link: ' + err.message + ' Many sites block cross-origin requests \u2014 try a direct file link, or download and upload the file instead.');
+    }
+  }
+
+  // ---------------- in-book search ----------------
+  function escapeRegex(s){ return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function buildSnippet(text, query){
+    text = (text || '').replace(/\s+/g, ' ').trim();
+    var idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx < 0) return text.slice(0, 140) + (text.length > 140 ? '…' : '');
+    var start = Math.max(0, idx - 58);
+    var end = Math.min(text.length, idx + query.length + 72);
+    return (start ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+  }
+  function clearSearchHighlights(){
+    var root = document.getElementById('reflow-content');
+    if (!root) return;
+    root.querySelectorAll('mark.search-hit').forEach(function(mark){
+      var text = document.createTextNode(mark.textContent);
+      mark.parentNode.replaceChild(text, mark);
+      if (text.parentNode) text.parentNode.normalize();
+    });
+  }
+  function setSearchPanelVisible(show){
+    var panel = document.getElementById('search-panel');
+    var btn = document.getElementById('search-btn');
+    if (!panel || !btn) return;
+    panel.classList.toggle('show', show);
+    panel.setAttribute('aria-hidden', show ? 'false' : 'true');
+    btn.classList.toggle('active', show);
+    btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+  }
+  function openSearchPanel(){
+    closeSettingsPanel();
+    setSearchPanelVisible(true);
+    setTimeout(function(){ try{ document.getElementById('book-search-input').focus({preventScroll:true}); }catch(e){ document.getElementById('book-search-input').focus(); } }, 0);
+  }
+  function closeSearchPanel(){
+    setSearchPanelVisible(false);
+    searchState.query = '';
+    searchState.results = [];
+    searchState.activeIndex = -1;
+    clearSearchHighlights();
+    var input = document.getElementById('book-search-input');
+    if (input) input.value = '';
+    renderSearchResults();
+  }
+  function toggleSearchPanel(){
+    var panel = document.getElementById('search-panel');
+    if (panel.classList.contains('show')) closeSearchPanel(); else openSearchPanel();
+  }
+  function renderSearchResults(){
+    var count = document.getElementById('book-search-count');
+    var list = document.getElementById('book-search-results');
+    var prev = document.getElementById('search-prev');
+    var next = document.getElementById('search-next');
+    if (!count || !list) return;
+    if (!searchState.query || searchState.query.length < 2){
+      count.textContent = 'Type 2+ characters';
+      list.innerHTML = '';
+      prev.disabled = true; next.disabled = true;
+      return;
+    }
+    if (!searchState.results.length){
+      count.textContent = 'No matches';
+      list.innerHTML = '<div class="search-result-snippet">No results for “' + escapeHtml(searchState.query) + '”.</div>';
+      prev.disabled = true; next.disabled = true;
+      return;
+    }
+    count.textContent = (searchState.activeIndex + 1) + ' of ' + searchState.results.length + (searchState.results.length >= 200 ? ' shown' : ' matches');
+    prev.disabled = false; next.disabled = false;
+    list.innerHTML = searchState.results.map(function(r, i){
+      return '<button class="search-result' + (i === searchState.activeIndex ? ' active' : '') + '" data-idx="' + i + '">' +
+        '<span class="search-result-page">' + escapeHtml(r.label) + '</span>' +
+        '<span class="search-result-snippet">' + escapeHtml(r.snippet) + '</span>' +
+      '</button>';
+    }).join('');
+    list.querySelectorAll('.search-result').forEach(function(btn){
+      btn.addEventListener('click', function(){ activateSearchResult(Number(btn.getAttribute('data-idx'))); });
+    });
+  }
+  function setActiveSearchMark(mark){
+    document.querySelectorAll('mark.search-hit.active').forEach(function(el){ el.classList.remove('active'); });
+    if (mark) mark.classList.add('active');
+  }
+  function activateSearchResult(index){
+    if (!searchState.results.length) return;
+    index = (index + searchState.results.length) % searchState.results.length;
+    searchState.activeIndex = index;
+    var r = searchState.results[index];
+    var meta = currentMeta();
+    if (!meta) return;
+    if (meta.contentType === 'reflow'){
+      reflowState.pageIndex = clampNumber(r.pageIndex, 0, reflowState.totalScreens - 1);
+      applyReflowTransform();
+      setActiveSearchMark(r.mark || null);
+      saveReflowProgress(); renderShelf();
+    } else {
+      var ppv = effectivePagesPerView();
+      pdfState.pageIndex = Math.max(0, Math.min(r.pageIndex - (r.pageIndex % ppv), meta.totalPages - 1));
+      renderPdfPages();
+      savePdfProgress(); renderShelf();
+    }
+    renderSearchResults();
+    var activeBtn = document.querySelector('.search-result.active');
+    if (activeBtn) activeBtn.scrollIntoView({block:'nearest'});
+  }
+  function collectTextNodes(root){
+    var nodes = [];
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node){
+        if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        var p = node.parentElement;
+        if (!p || p.closest('mark.search-hit')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    return nodes;
+  }
+  function runReflowSearch(query){
+    clearSearchHighlights();
+    var root = document.getElementById('reflow-content');
+    var results = [];
+    var regex = new RegExp(escapeRegex(query), 'ig');
+    collectTextNodes(root).forEach(function(node){
+      if (results.length >= 200) return;
+      var text = node.nodeValue;
+      regex.lastIndex = 0;
+      if (!regex.test(text)) return;
+      regex.lastIndex = 0;
+      var frag = document.createDocumentFragment();
+      var last = 0, match;
+      while ((match = regex.exec(text)) && results.length < 200){
+        if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+        var mark = document.createElement('mark');
+        mark.className = 'search-hit';
+        mark.textContent = match[0];
+        frag.appendChild(mark);
+        results.push({ mark: mark, rawText: text, snippet: buildSnippet(text, query), pageIndex: 0, label: 'Match' });
+        last = match.index + match[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+    var viewport = document.getElementById('reflow-viewport');
+    var content = document.getElementById('reflow-content');
+    var vw = Math.max(1, reflowInnerSize(viewport).w);
+    var oldTransform = content.style.transform;
+    content.style.transform = 'translateX(0px)';
+    var contentRect = content.getBoundingClientRect();
+    results.forEach(function(r, i){
+      var rect = r.mark.getBoundingClientRect();
+      var x = rect.left - contentRect.left;
+      var page = clampNumber(Math.floor(x / vw), 0, Math.max(0, reflowState.totalScreens - 1));
+      r.pageIndex = page;
+      r.label = 'Screen ' + (page + 1);
+      r.mark.setAttribute('data-search-index', i);
+    });
+    content.style.transform = oldTransform;
+    applyReflowTransform();
+    return results;
+  }
+  async function runPdfSearch(query, token){
+    var results = [];
+    var meta = currentMeta();
+    if (!pdfState.doc || !meta) return results;
+    var regex = new RegExp(escapeRegex(query), 'ig');
+    for (var pageNum=1; pageNum<=pdfState.doc.numPages && results.length<200; pageNum++){
+      if (token !== searchState.token) return [];
+      var page = await pdfState.doc.getPage(pageNum);
+      var textContent = await page.getTextContent();
+      var text = textContent.items.map(function(item){ return item.str || ''; }).join(' ').replace(/\s+/g, ' ');
+      regex.lastIndex = 0;
+      var match;
+      while ((match = regex.exec(text)) && results.length < 200){
+        results.push({ pageIndex: pageNum - 1, label: 'Page ' + pageNum, snippet: buildSnippet(text.slice(Math.max(0, match.index - 80), match.index + query.length + 100), query) });
+      }
+      if (pageNum % 8 === 0){
+        document.getElementById('book-search-count').textContent = 'Searching PDF… page ' + pageNum + ' of ' + pdfState.doc.numPages;
+      }
+    }
+    return results;
+  }
+  function scheduleBookSearch(){
+    clearTimeout(searchState.timer);
+    searchState.timer = setTimeout(runBookSearch, 240);
+  }
+  async function runBookSearch(){
+    var meta = currentMeta();
+    if (!meta) return;
+    var input = document.getElementById('book-search-input');
+    var query = (input.value || '').trim();
+    searchState.query = query;
+    searchState.results = [];
+    searchState.activeIndex = -1;
+    searchState.token++;
+    var token = searchState.token;
+    if (query.length < 2){ clearSearchHighlights(); renderSearchResults(); return; }
+    if (meta.contentType === 'reflow'){
+      searchState.results = runReflowSearch(query);
+      searchState.activeIndex = searchState.results.length ? 0 : -1;
+      if (searchState.results.length) activateSearchResult(0); else renderSearchResults();
+    } else {
+      document.getElementById('book-search-count').textContent = 'Searching PDF…';
+      document.getElementById('book-search-results').innerHTML = '';
+      try{
+        searchState.results = await runPdfSearch(query, token);
+        if (token !== searchState.token) return;
+        searchState.activeIndex = searchState.results.length ? 0 : -1;
+        if (searchState.results.length) activateSearchResult(0); else renderSearchResults();
+      }catch(err){
+        console.error(err);
+        if (token === searchState.token){
+          searchState.results = [];
+          document.getElementById('book-search-count').textContent = 'Search failed';
+        }
+      }
+    }
+  }
+
+  // ---------------- library backup / restore ----------------
+  async function exportLibraryBackup(){
+    clearError();
+    if (!library.length){ showNotice('Your shelf is empty — there is nothing to export yet.'); return; }
+    try{
+      var backup = { app: 'Foxed', version: 2, exportedAt: new Date().toISOString(), library: library, contents: {} };
+      for (var i=0; i<library.length; i++){
+        var item = library[i];
+        var content = await loadBookContent(item.id);
+        if (content) backup.contents[item.id] = content;
+      }
+      var blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'foxed-library-backup-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+      showNotice('Library backup exported. Keep it somewhere safe.');
+    }catch(err){
+      console.error(err);
+      showError('Could not export the library backup: ' + err.message);
+    }
+  }
+
+  function cleanImportedMeta(meta){
+    return {
+      id: meta.id && /^b_[a-z0-9_]+$/i.test(meta.id) ? meta.id : uid(),
+      title: (meta.title || 'Untitled').toString().slice(0, 240),
+      author: (meta.author || 'Unknown author').toString().slice(0, 240),
+      format: (meta.format || 'txt').toString().slice(0, 20),
+      contentType: meta.contentType === 'paged' ? 'paged' : 'reflow',
+      source: meta.source || null,
+      fingerprint: meta.fingerprint || null,
+      addedAt: Number(meta.addedAt) || Date.now(),
+      lastOpenedAt: Number(meta.lastOpenedAt) || Date.now(),
+      spineColor: /^#[0-9a-f]{6}$/i.test(meta.spineColor || '') ? meta.spineColor : pickColor(meta.title || 'Untitled'),
+      progressFraction: clampNumber(Number(meta.progressFraction) || 0, 0, 1),
+      totalPages: Math.max(1, Number(meta.totalPages) || 1),
+      pdfPageIndex: Math.max(0, Number(meta.pdfPageIndex) || 0)
+    };
+  }
+
+  async function importLibraryBackup(file){
+    clearError();
+    try{
+      var text = await file.text();
+      var backup = JSON.parse(text);
+      if (!backup || backup.app !== 'Foxed' || !Array.isArray(backup.library) || !backup.contents){
+        throw new Error('This does not look like a Foxed backup file.');
+      }
+      var imported = 0, skipped = 0;
+      for (var i=0; i<backup.library.length; i++){
+        var meta = cleanImportedMeta(backup.library[i] || {});
+        if (findDuplicateBook(meta)){ skipped++; continue; }
+        var content = backup.contents[(backup.library[i] || {}).id];
+        if (!content){ skipped++; continue; }
+        while (library.some(function(b){ return b.id === meta.id; })) meta.id = uid();
+        if (meta.contentType === 'reflow'){
+          if (!content.html){ skipped++; continue; }
+          content = {html: sanitizeStoredHtml(content.html)};
+          meta.progressFraction = clampNumber(meta.progressFraction || 0, 0, 1);
+          delete meta.totalPages; delete meta.pdfPageIndex;
+        } else {
+          if (!content.pdfBase64 || content.pdfBase64.length > MAX_UPLOAD_BYTES * 1.45){ skipped++; continue; }
+          content = {pdfBase64: content.pdfBase64};
+          meta.totalPages = Math.max(1, meta.totalPages || 1);
+          meta.pdfPageIndex = Math.min(meta.pdfPageIndex || 0, meta.totalPages - 1);
+          delete meta.progressFraction;
+        }
+        var ok = await saveBookContent(meta.id, content);
+        if (!ok){ skipped++; continue; }
+        library.unshift(meta);
+        imported++;
+      }
+      await saveLibraryIndex();
+      renderShelf();
+      renderContinueGrid();
+      showView('landing');
+      showNotice(imported + ' book' + (imported === 1 ? '' : 's') + ' imported' + (skipped ? ' · ' + skipped + ' skipped' : '') + '.');
+    }catch(err){
+      console.error(err);
+      showError('Could not import backup: ' + err.message);
+    }
+  }
+
+  // ---------------- shortcuts help ----------------
+  function openShortcutsModal(){
+    document.getElementById('shortcuts-modal').classList.add('show');
+    try{ document.getElementById('shortcuts-close-btn').focus({preventScroll:true}); }catch(e){ document.getElementById('shortcuts-close-btn').focus(); }
+  }
+  function closeShortcutsModal(){ document.getElementById('shortcuts-modal').classList.remove('show'); }
+
+  // ---------------- reader settings + swipe gestures ----------------
+  function closeSettingsPanel(){
+    var panel = document.getElementById('settings-panel');
+    var btn = document.getElementById('settings-btn');
+    if (!panel || !btn) return;
+    panel.classList.remove('show');
+    panel.setAttribute('aria-hidden', 'true');
+    btn.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleSettingsPanel(){
+    var panel = document.getElementById('settings-panel');
+    var btn = document.getElementById('settings-btn');
+    var show = !panel.classList.contains('show');
+    if (show) setSearchPanelVisible(false);
+    panel.classList.toggle('show', show);
+    panel.setAttribute('aria-hidden', show ? 'false' : 'true');
+    btn.classList.toggle('active', show);
+    btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+  }
+
+  function changeReaderPref(key, delta, min, max){
+    readerPrefs[key] = clampNumber(readerPrefs[key] + delta, min, max);
+    applyReaderSettings();
+    saveSettings();
+    updateReaderLayoutAfterSettings();
+  }
+
+  function setReaderTheme(theme){
+    readerPrefs.theme = THEMES.indexOf(theme) > -1 ? theme : 'light';
+    applyReaderSettings();
+    saveSettings();
+  }
+
+  var swipeState = { active:false, x:0, y:0, t:0, pointerId:null };
+  function shouldIgnoreSwipeTarget(target){
+    return !!(target.closest && target.closest('button, input, .settings-panel, .page-zoom, .modal-overlay, .delete-popover'));
+  }
+  function wireSwipeGestures(){
+    var body = document.getElementById('reader-body');
+    body.addEventListener('pointerdown', function(e){
+      if (e.pointerType === 'mouse' || shouldIgnoreSwipeTarget(e.target) || zoomState.level > 1) return;
+      swipeState.active = true;
+      swipeState.x = e.clientX;
+      swipeState.y = e.clientY;
+      swipeState.t = Date.now();
+      swipeState.pointerId = e.pointerId;
+    });
+    body.addEventListener('pointerup', function(e){
+      if (!swipeState.active || e.pointerId !== swipeState.pointerId) return;
+      var dx = e.clientX - swipeState.x;
+      var dy = e.clientY - swipeState.y;
+      var dt = Date.now() - swipeState.t;
+      swipeState.active = false;
+      if (isFlipping || dt > 900 || Math.abs(dx) < 54 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
+      if (dx < 0) goNext(); else goPrev();
+    });
+    body.addEventListener('pointercancel', function(){ swipeState.active = false; });
+  }
+
+  // ---------------- resize handling ----------------
+  var resizeTimer = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      var meta = currentMeta();
+      if (!meta) return;
+      resetZoom();
+      if (meta.contentType === 'reflow' && document.getElementById('reader-view').style.display === 'flex'){
+        var fraction = reflowState.totalScreens > 1 ? reflowState.pageIndex / (reflowState.totalScreens - 1) : 0;
+        layoutReflow(fraction);
+      } else if (meta.contentType === 'paged' && document.getElementById('reader-view').style.display === 'flex'){
+        renderPdfPages();
+      }
+    }, 180);
+  });
+
+  // ---------------- wiring ----------------
+  function wireEvents(){
+    wireSwipeGestures();
+    document.getElementById('search-btn').addEventListener('click', toggleSearchPanel);
+    document.getElementById('book-search-close').addEventListener('click', closeSearchPanel);
+    document.getElementById('book-search-input').addEventListener('input', scheduleBookSearch);
+    document.getElementById('book-search-input').addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); activateSearchResult(searchState.activeIndex + (e.shiftKey ? -1 : 1)); }
+      if (e.key === 'Escape'){ e.preventDefault(); closeSearchPanel(); }
+    });
+    document.getElementById('search-prev').addEventListener('click', function(){ activateSearchResult(searchState.activeIndex - 1); });
+    document.getElementById('search-next').addEventListener('click', function(){ activateSearchResult(searchState.activeIndex + 1); });
+    document.getElementById('export-library-btn').addEventListener('click', exportLibraryBackup);
+    document.getElementById('import-library-btn').addEventListener('click', function(){ document.getElementById('import-library-input').click(); });
+    document.getElementById('import-library-input').addEventListener('change', function(){
+      var file = this.files && this.files[0];
+      if (file) importLibraryBackup(file);
+      this.value = '';
+    });
+    document.getElementById('shortcuts-btn').addEventListener('click', openShortcutsModal);
+    document.getElementById('shortcuts-close-btn').addEventListener('click', closeShortcutsModal);
+    document.getElementById('shortcuts-modal').addEventListener('click', function(e){ if (e.target.id === 'shortcuts-modal') closeShortcutsModal(); });
+    document.getElementById('settings-btn').addEventListener('click', toggleSettingsPanel);
+    document.getElementById('font-down').addEventListener('click', function(){ changeReaderPref('fontScale', -0.1, 0.75, 1.6); });
+    document.getElementById('font-up').addEventListener('click', function(){ changeReaderPref('fontScale', 0.1, 0.75, 1.6); });
+    document.getElementById('line-down').addEventListener('click', function(){ changeReaderPref('lineScale', -0.05, 0.85, 1.35); });
+    document.getElementById('line-up').addEventListener('click', function(){ changeReaderPref('lineScale', 0.05, 0.85, 1.35); });
+    document.getElementById('margin-down').addEventListener('click', function(){ changeReaderPref('marginScale', -0.1, 0.65, 1.45); });
+    document.getElementById('margin-up').addEventListener('click', function(){ changeReaderPref('marginScale', 0.1, 0.65, 1.45); });
+    document.querySelectorAll('.theme-choice').forEach(function(btn){
+      btn.addEventListener('click', function(){ setReaderTheme(btn.getAttribute('data-theme')); });
+    });
+
+    document.getElementById('popover-cancel-btn').addEventListener('click', closeBookPopover);
+    document.getElementById('popover-delete-btn').addEventListener('click', function(){
+      var id = pendingPopoverId;
+      closeBookPopover();
+      if (id) askRemoveBook(id);
+    });
+    document.addEventListener('pointerdown', function(e){
+      var pop = document.getElementById('book-popover');
+      if (pop && pop.classList.contains('show') && !pop.contains(e.target) && !e.target.closest('.spine, .book-card')) closeBookPopover();
+      var panel = document.getElementById('settings-panel');
+      if (panel && panel.classList.contains('show') && !panel.contains(e.target) && e.target.id !== 'settings-btn') closeSettingsPanel();
+      var search = document.getElementById('search-panel');
+      if (search && search.classList.contains('show') && !search.contains(e.target) && e.target.id !== 'search-btn') setSearchPanelVisible(false);
+    });
+
+    document.getElementById('confirm-cancel-btn').addEventListener('click', closeConfirmModal);
+    document.getElementById('confirm-modal').addEventListener('click', function(e){
+      if (e.target.id === 'confirm-modal') closeConfirmModal();
+    });
+    document.getElementById('confirm-remove-btn').addEventListener('click', function(){
+      var id = pendingRemoveId;
+      closeConfirmModal();
+      if (id) removeBook(id);
+    });
+
+    document.querySelectorAll('#reflow-zoom-left .pz-in, #reflow-zoom-right .pz-in').forEach(function(btn){
+      btn.addEventListener('click', function(){ setZoom(zoomState.level + ZOOM_STEP); });
+    });
+    document.querySelectorAll('#reflow-zoom-left .pz-out, #reflow-zoom-right .pz-out').forEach(function(btn){
+      btn.addEventListener('click', function(){ setZoom(zoomState.level - ZOOM_STEP); });
+    });
+
+    var reflowLayer = document.getElementById('reflow-zoom-layer');
+    reflowLayer.addEventListener('pointerdown', zoomPointerDown);
+    reflowLayer.addEventListener('pointermove', zoomPointerMove);
+    reflowLayer.addEventListener('pointerup', zoomPointerUp);
+    reflowLayer.addEventListener('pointercancel', zoomPointerUp);
+
+    document.getElementById('new-book-btn').addEventListener('click', function(){
+      currentBookId = null;
+      clearError();
+      renderShelf();
+      renderContinueGrid();
+      showView('landing');
+    });
+    document.getElementById('back-btn').addEventListener('click', function(){
+      currentBookId = null;
+      renderShelf();
+      renderContinueGrid();
+      showView('landing');
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.getAttribute('data-tab')).classList.add('active');
+        clearError();
+      });
+    });
+
+    var dropzone = document.getElementById('dropzone');
+    var fileInput = document.getElementById('file-input');
+    dropzone.addEventListener('click', function(){ fileInput.click(); });
+    dropzone.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fileInput.click(); }
+    });
+    fileInput.addEventListener('change', function(){
+      if (fileInput.files[0]) handleFile(fileInput.files[0]);
+      fileInput.value = '';
+    });
+    dropzone.addEventListener('dragover', function(e){ e.preventDefault(); dropzone.classList.add('drag'); });
+    dropzone.addEventListener('dragleave', function(){ dropzone.classList.remove('drag'); });
+    dropzone.addEventListener('drop', function(e){
+      e.preventDefault();
+      dropzone.classList.remove('drag');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById('link-fetch-btn').addEventListener('click', function(){
+      handleLink(document.getElementById('link-input').value.trim());
+    });
+    document.getElementById('link-input').addEventListener('keydown', function(e){
+      if (e.key === 'Enter') handleLink(document.getElementById('link-input').value.trim());
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', goPrev);
+    document.getElementById('next-btn').addEventListener('click', goNext);
+    document.getElementById('mode-1').addEventListener('click', function(){ setPagesPerView(1); });
+    document.getElementById('mode-2').addEventListener('click', function(){ setPagesPerView(2); });
+
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && document.getElementById('reader-view').style.display === 'flex'){
+        e.preventDefault();
+        openSearchPanel();
+        return;
+      }
+      if (e.key === 'Escape'){
+        if (document.getElementById('confirm-modal').classList.contains('show')){
+          closeConfirmModal();
+          return;
+        }
+        if (document.getElementById('book-popover').classList.contains('show')){
+          closeBookPopover();
+          return;
+        }
+        if (document.getElementById('settings-panel').classList.contains('show')){
+          closeSettingsPanel();
+          return;
+        }
+        if (document.getElementById('shortcuts-modal').classList.contains('show')){
+          closeShortcutsModal();
+          return;
+        }
+        if (document.getElementById('search-panel').classList.contains('show')){
+          setSearchPanelVisible(false);
+          return;
+        }
+      }
+      if (document.getElementById('reader-view').style.display !== 'flex') return;
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    });
+  }
+
+  async function init(){
+    wireEvents();
+    await loadLibraryIndex();
+    await loadSettings();
+    updateModeButtons();
+    updateZoomUI();
+    renderShelf();
+    renderContinueGrid();
+    showView('landing');
+  }
+
+  if (pdfjsLib && pdfjsLib.GlobalWorkerOptions){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.mjs';
+  }
+
+  init();
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1772a089d6d179a',t:'MTc4MzQzMDYxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
