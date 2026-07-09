@@ -1,220 +1,298 @@
-# Online Book Opener
+# Foxed
 
-Online Book Opener is a browser-like digital reading workspace for PDFs and public Open Library results.
+**Foxed** is a polished web-based book opener and reader for TXT, EPUB, PDF, and direct book links. It gives local files a real reading-app feel: a remembered shelf, paged reading, animated page turns, themes, search, backup/restore, and responsive layouts for desktop, tablet, and mobile.
 
-It combines:
-- multi-book tabs
-- persistent recent library
-- PDF.js rendering
-- IndexedDB-backed reading state
-- per-book zoom and transparency
-- bookmarks and notes
-- command-first navigation
+> Foxed is web-based. It is not currently packaged as an offline/PWA app.
+
+---
 
 ## Features
 
-### Reading workspace
-- Open multiple books at the same time
-- Browser-style tabs with instant switching
-- Close tabs independently
-- Restore open tabs after refresh
+### Book opening
 
-### PDF reading
-- Local PDF upload via button or `Ctrl + O`
-- PDF.js rendering with lazy-loaded document pipeline
-- Cached page bitmaps for smoother revisits
-- Single-page and two-page reading modes
-- Rendering quality modes: draft, balanced, sharp
+- Open books from your device:
+  - `.txt`
+  - `.epub`
+  - `.pdf`
+- Open books from direct links:
+  - TXT links
+  - EPUB links
+  - PDF links
+  - Basic readable HTML pages
+- Drag and drop file upload.
+- Click-to-select file upload.
+- URL fetch input with validation.
+- File/link size limits to protect browser performance.
 
-### Navigation
-- Previous / next navigation
-- Bottom thumbnail page rail
-- Fast page jumping
-- Current page highlighting
-- Command palette page jump support
+### Local shelf
 
-### Personal workflow
-- Persistent recent PDF library
-- Bookmarks per book
-- Notes per page
-- Per-book settings persistence
+- Recently opened books appear on a visual shelf.
+- Books have colored spines.
+- Continue reading cards show recent books.
+- Reading progress is remembered.
+- Duplicate detection prevents adding the same book repeatedly.
+- Hold/long-press a book to reveal delete options.
+- Delete confirmation modal prevents accidental removal.
 
-### Search and discovery
-- Open Library search drawer
-- Metadata cards for unavailable previews
-- Public readable results can open inside the workspace when embeddable
+### Reader modes
 
-## Screenshots
+- One-page reading mode.
+- Two-page spread mode.
+- On small screens, the reader automatically falls back to a device-friendly single-page layout.
+- Works across desktop, tablet, and mobile-sized screens.
 
-Suggested screenshots to add:
-- Main workspace with multiple tabs
-- Recent library + Open Library drawer
-- PDF thumbnail navigation rail
-- Bookmarks and notes side panels
-- Command palette
+### Page turning
 
-If you want to version screenshots in the repo later, place them under:
+- Animated page movement.
+- Adaptive animation selection:
+  - 3D flip on capable desktop devices.
+  - Lightweight slide animation on compact/touch/low-power devices.
+  - Reduced/no animation for users with reduced-motion preferences.
+- In two-page mode, only the correct page flips:
+  - Next turns the right page.
+  - Previous turns the left page.
+- Page content is prepared and timed during the animation to reduce visible snapping.
+- Page counter updates as navigation starts.
 
-```text
-/docs/screenshots/
-```
+### Zoom and navigation
 
-## Architecture
+- Previous/Next buttons.
+- Keyboard navigation:
+  - `←` previous page
+  - `→` next page
+- Swipe navigation on touch devices:
+  - Swipe left for next page.
+  - Swipe right for previous page.
+- Per-page zoom controls.
+- Drag-to-pan when zoomed.
+- Zoom resets safely during page navigation.
 
-```mermaid
-flowchart LR
-  A[App Shell] --> B[Search Drawer]
-  A --> C[Tab Strip]
-  A --> D[Book Viewer]
-  A --> E[Command Palette]
+### Reading settings
 
-  B --> F[Open Library Service]
-  B --> G[Recent Library Hook]
+Use the `Aa` button in the reader to customize:
 
-  D --> H[PDF Reading Workspace]
-  H --> I[PDF Reader Hook]
-  H --> J[Thumbnail Rail]
-  H --> K[Bookmarks Panel]
-  H --> L[Notes Panel]
+- Text size
+- Line spacing
+- Page margins
+- Reading theme
 
-  I --> M[PDF Service]
-  H --> N[PDF Render Cache]
+Available themes:
 
-  O[Zustand Workspace Store] --> A
-  O --> D
-  O --> B
-  O --> E
+- Paper
+- Sepia
+- Warm
+- Dark
+- Black
+- Contrast
 
-  P[IndexedDB Storage] --> O
-  P --> G
-  M --> P
-```
+Settings are saved automatically.
 
-## Tech stack
-- React
-- TypeScript
-- Tailwind CSS
-- Zustand
-- PDF.js
-- Framer Motion
-- IndexedDB via `idb`
-- Lucide icons
+### In-book search
 
-## Project structure
+Use the search button or `Ctrl/Cmd + F` while reading.
 
-```text
-src/
-  components/
-    bookmarks/
-    command-palette/
-    library/
-    notes/
-    pdf-viewer/
-    search-drawer/
-    ui/
-  hooks/
-  services/
-  storage/
-  store/
-  types-books.ts
-```
+Search features:
 
-## Installation
+- TXT/EPUB text search.
+- PDF text search using PDF.js text extraction.
+- Result count.
+- Previous/Next result navigation.
+- Search result snippets.
+- Click a result to jump to its page/screen.
+- TXT/EPUB matches are highlighted in the text.
+- Search results are capped for performance.
 
-### Prerequisites
-- Node.js 20+
-- npm 10+
+### Library backup and restore
 
-### Setup
-```bash
-git clone https://github.com/MNPranava/Online_book_opener.git
-cd Online_book_opener
-npm install
-npm run dev
-```
+- Export the local library to a JSON backup file.
+- Import a Foxed backup file later.
+- Import skips duplicate books.
+- Imported HTML content is sanitized before being saved.
 
-### Production build
-```bash
-npm run build
-npm run preview
-```
+### Keyboard shortcuts help
 
-## Keyboard shortcuts
+The `?` button opens a shortcut reference.
 
-| Shortcut | Action |
+Included shortcuts:
+
+- `←` previous page
+- `→` next page
+- `Del` delete focused shelf book
+- `Esc` close popovers and dialogs
+- Swipe gestures on touch devices
+
+### Privacy and storage
+
+Foxed is designed for local reading:
+
+- Uploaded file content is processed in the browser.
+- Book metadata and content are saved locally where supported.
+- Storage priority:
+  1. Host-provided `window.storage`, if available.
+  2. IndexedDB.
+  3. localStorage fallback for smaller data.
+- Direct link fetching requires the browser to request that URL.
+- Some websites may block direct fetches because of CORS restrictions.
+
+---
+
+## How to use
+
+### Open a local book
+
+1. Open `foxed_updated.html` in a browser or hosted page.
+2. Choose **Upload a file**.
+3. Drop a `.txt`, `.epub`, or `.pdf` file into the upload area, or click to select one.
+4. The book opens in the reader.
+
+### Open a book from a link
+
+1. Select the **From a link** tab.
+2. Paste a direct link to a TXT, EPUB, or PDF file.
+3. Click **Fetch book**.
+
+If the link fails, the website may be blocking cross-origin browser requests. Download the file and upload it manually instead.
+
+### Change reading theme
+
+1. Open a book.
+2. Click **Aa** in the reader toolbar.
+3. Pick a theme:
+   - Paper
+   - Sepia
+   - Warm
+   - Dark
+   - Black
+   - Contrast
+
+### Search inside a book
+
+1. Open a book.
+2. Click the search icon `⌕`, or press `Ctrl/Cmd + F`.
+3. Type at least two characters.
+4. Use Previous/Next or click a result.
+
+### Delete a book
+
+1. On the shelf or continue-reading card, hold/long-press the book.
+2. Choose **Delete book**.
+3. Confirm removal.
+
+Keyboard option:
+
+1. Focus a shelf book.
+2. Press `Delete` or `Backspace`.
+3. Confirm removal.
+
+### Export your library
+
+1. Use the sidebar **Export** button.
+2. Save the generated JSON backup somewhere safe.
+
+### Import a library backup
+
+1. Use the sidebar **Import** button.
+2. Choose a Foxed backup JSON file.
+3. Foxed imports new books and skips duplicates.
+
+---
+
+## Supported formats
+
+| Format | Support |
 |---|---|
-| `Ctrl + O` | Upload PDF |
-| `Ctrl + K` | Open command palette |
-| `Ctrl + Tab` | Switch active tab |
-| `Ctrl + W` | Close active tab |
-| `+` / `=` | Zoom in active book |
-| `-` | Zoom out active book |
-| `Esc` | Close command palette |
+| TXT | Reflowed paged reading |
+| EPUB | Basic spine/content extraction with sanitized HTML and inline images |
+| PDF | Canvas-based paged rendering using PDF.js |
+| Direct links | Works best with direct TXT, EPUB, or PDF URLs |
+| HTML links | Basic readable-body extraction, sanitized before rendering |
 
-## Current reading capabilities
+---
 
-### Per-book state
-Each book remembers its own:
-- current page
-- zoom level
-- transparency settings
-- theme
-- page mode
-- rendering quality
-- bookmarks
-- notes
+## Current limitations
 
-### IndexedDB persistence
-The app stores:
-- uploaded PDF blobs
-- recent library metadata
-- open tab sessions
-- reading state
+- Not a PWA/offline app yet.
+- CDN/network access is needed for external libraries and fonts when used as-is.
+- EPUB support is intentionally simplified:
+  - No DRM support.
+  - Limited EPUB styling.
+  - Complex layouts may not preserve publisher formatting exactly.
+- PDF search depends on extractable text. Scanned image-only PDFs may not return useful results.
+- Large books may be limited by browser memory and storage quota.
+- Some direct links fail due to CORS restrictions.
 
-## Error handling
-Current UX handles:
-- unsupported files
-- corrupted PDFs
-- missing IndexedDB file blobs
-- IndexedDB access failures
-- Open Library API failures
-- reader rendering errors via error boundary
+---
 
-## Build optimization
-The app now uses lazy loading for heavy modules:
-- PDF reading workspace
-- command palette
-- PDF.js service chunk
+## Security notes
 
-This reduces the initial app bundle significantly while keeping PDF features available on demand.
+Foxed includes several browser-side hardening measures:
 
-## Roadmap
+- Sanitizes EPUB/HTML content before inserting it into the reader.
+- Removes scripts, event handlers, forms, iframes, SVG/math/object/embed content, and unsafe attributes.
+- Blocks unsafe/remote images from fetched HTML.
+- Uses PDF.js with `isEvalSupported: false`.
+- Applies file/link size limits.
+- Uses Subresource Integrity for JSZip CDN loading.
 
-### Stabilization / QA
-- additional browser QA matrix
-- cache telemetry and profiling
-- better offline/error recovery messaging
+For a production deployment, recommended next hardening steps:
 
-### Next possible enhancements
-- search inside PDF
-- text highlights / annotations
-- import/export bookmarks and notes
-- thumbnail virtualization for very large PDFs
-- advanced recent library filters
+- Self-host or bundle dependencies.
+- Add a strict Content Security Policy.
+- Add automated malicious EPUB/PDF fixtures for regression testing.
+- Consider stronger sanitization with a dedicated sanitizer library if the project grows.
 
-## Development notes
+---
 
-### Why IndexedDB?
-Local PDFs are too large for `localStorage`. IndexedDB keeps blobs persistent without bloating Zustand state.
+## Project file
 
-### Why lazy-load PDF features?
-PDF.js is heavy. Splitting the PDF viewer and PDF service keeps the first load much faster for non-PDF workflows.
+Main app file:
 
-## Status
-Current version is focused on:
-- stability
-- persistent reading workflow
-- multi-book productivity
-- maintainable architecture
+```text
+foxed_updated.html
+```
 
-It is now positioned as a production-oriented digital reading workspace rather than a static page-flip demo.
+Reference report:
+
+```text
+foxed_audit_report.md
+```
+
+---
+
+## Recommended browser support
+
+Foxed is intended for modern browsers with support for:
+
+- ES modules / dynamic import
+- IndexedDB
+- CSS transforms
+- Pointer events
+- Canvas
+- File API
+
+Recommended browsers:
+
+- Chrome / Edge
+- Firefox
+- Safari
+- Mobile Safari / Chrome Android
+
+---
+
+## Future ideas
+
+Potential future improvements:
+
+- Table of contents drawer.
+- Bookmarks and notes.
+- Shelf sorting/filtering.
+- PDF page pre-render cache.
+- Better EPUB navigation parsing.
+- Import progress for large backups.
+- More typography controls.
+
+---
+
+## License
+
+This project is licensed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
